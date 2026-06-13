@@ -143,8 +143,6 @@ class OutputConv(torch.nn.Module):
 
 #ask about seed for conv block calling class
 
-
-
 class UNet(torch.nn.Module):
     def __init__(
         self,
@@ -158,6 +156,7 @@ class UNet(torch.nn.Module):
         kernel_size: int = 3,
         padding: str = "same",
         upsample_mode: str = "nearest",
+        ndim: int = 2
     ):
         """A U-Net for 2D input that expects tensors shaped like::
             ``(batch, channels, height, width)``.
