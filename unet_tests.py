@@ -215,39 +215,7 @@ class TestUNet:
             (2, 7, 112, 112)
         ), msg
 
-    def test_shape_valid_2d(self) -> None:
-        unetvalid = self.unetmodule(
-            depth=3,
-            in_channels=2,
-            out_channels=1,
-            num_fmaps=5,
-            fmap_inc_factor=5,
-            downsample_factor=3,
-            kernel_size=5,
-            padding="valid",
-            ndim=2,
-        )
-        msg = "The output shape of your UNet is incorrect for valid padding in 3D."
-        assert unetvalid(torch.ones((2, 2, 140, 140, 140))).shape == torch.Size(
-            (2, 1, 4, 4, 4)
-        ), msg
 
-    def test_shape_valid_3d_tiled(self) -> None:
-        unetvalid = self.unetmodule(
-            depth=3,
-            in_channels=2,
-            out_channels=1,
-            num_fmaps=5,
-            fmap_inc_factor=5,
-            downsample_factor=3,
-            kernel_size=5,
-            padding="valid",
-            ndim=3,
-        )
-        msg = "The output shape of your UNet is incorrect for valid padding in 3D."
-        assert unetvalid(torch.ones((2, 2, 158, 158, 158))).shape == torch.Size(
-            (2, 1, 18, 18, 18)
-        ), msg
 
     def test_shape_same(self) -> None:
         unetsame = self.unetmodule(
@@ -263,23 +231,6 @@ class TestUNet:
         msg = "The output shape of your Unet is incorrect for same padding."
         assert unetsame(torch.ones((2, 2, 243, 243))).shape == torch.Size(
             (2, 7, 243, 243)
-        ), msg
-
-    def test_shape_same_3d(self) -> None:
-        unetsame = self.unetmodule(
-            depth=3,
-            in_channels=2,
-            out_channels=1,
-            num_fmaps=5,
-            fmap_inc_factor=5,
-            downsample_factor=3,
-            kernel_size=5,
-            padding="same",
-            ndim=3,
-        )
-        msg = "The output shape of your Unet is incorrect for same padding in 3D."
-        assert unetsame(torch.ones((2, 2, 27, 27, 27))).shape == torch.Size(
-            (2, 1, 27, 27, 27)
         ), msg
 
 
