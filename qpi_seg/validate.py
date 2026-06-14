@@ -51,8 +51,6 @@ def validate(
             # however this is very dependent on your choice of loss function and
             # metric. If you get errors such as "RuntimeError: Found dtype Float but expected Short"
             # then this is where you should look.
-            if y.dtype != prediction.dtype:
-                y = y.type(prediction.dtype)
             val_loss += loss_function(prediction,y) # TODO
             val_metric += metric(prediction,y) # TODO
 

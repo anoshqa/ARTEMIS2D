@@ -11,6 +11,7 @@ import torchvision.transforms.v2 as transforms_v2
 import qpi_seg.file_charactersmatch as filetest
 import torch.nn.functional as F
 import qpi_seg.train_model as train_model
+import qpi_seg.validate as validate
 import qpi_seg.mean_fn as mean
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 assert torch.cuda.is_available()
@@ -41,18 +42,23 @@ val_mask_files = mask_files[num_train_mask_files:] # YOUR CODE HERE
 
 
 train_mean, train_std= mean.mean_fn(image_folder,train_image_files)
+
 print(train_mean,train_std)
-trainQPIdataset=qpi_seg.dataset.MIPDataset(image_folder,mask_folder,train_image_files, train_mask_files,transform=transforms_v2.Resize((832,832)),norm_setting="Dataset",mean=train_mean, std=train_std) #original image is 836,836
-validationQPIdataset=qpi_seg.dataset.MIPDataset(image_folder,mask_folder,val_image_files, val_mask_files,transform=transforms_v2.Resize((832,832)),norm_setting="Dataset",mean=train_mean, std=train_std)
+trainQPIdataset=qpi_seg.dataset.MIPDataset(image_folder,mask_folder,train_image_files, train_mask_files,transform=transforms_v2.Resize((832,832),interpolation=transforms_v2.InterpolationMode.NEAREST),norm_setting="Dataset",norm_mean=train_mean, norm_std=train_std) #original image is 836,836
+validationQPIdataset=qpi_seg.dataset.MIPDataset(image_folder,mask_folder,val_image_files, val_mask_files,transform=transforms_v2.Resize((832,832),interpolation=transforms_v2.InterpolationMode.NEAREST),norm_setting="Dataset",norm_mean=train_mean, norm_std=train_std)
 
-train_loader=DataLoader(trainQPIdataset, batch_size=8, shuffle=True)
-val_loader=DataLoader(validationQPIdataset, batch_size=8,shuffle=True)
-batch=next(iter(train_loader))
+train_loader=DataLoader(trainQPIdataset, batch_size=1, shuffle=True)
+val_loader=DataLoader(validationQPIdataset, batch_size=1,shuffle=True)
+batch_image,batch_mask=next(iter(train_loader))
+print(batch_image.shape)
+print(batch_mask.shape)
+#visualize.visualize(batch_image.squeeze(),batch_mask.squeeze())
 
 
-myUnet = UNet(depth=4,in_channels=1,out_channels=1, num_fmaps=4).to(device)
+myUnet = UNet(depth=4,in_channels=1,out_channels=5, num_fmaps=4).to(device)
 loss=nn.CrossEntropyLoss()
 optimizer=torch.optim.Adam(myUnet.parameters())
 
-for epoch in range(10):
+for epoch in range(3):
     train_model.train_model(myUnet, train_loader, optimizer, loss, epoch, device=device)
+#get a validation metric

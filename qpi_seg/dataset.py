@@ -27,6 +27,7 @@ class MIPDataset(torch.utils.data.Dataset):
         for sample_ind in tqdm(range(self.num_samples),desc="Reading images"):
             img_path = os.path.join(self.image_folder, self.image_files[sample_ind])
             image = self.from_np(tifffile.imread(img_path))
+            image=image.float()
             if norm_setting =="Dataset":
                 image = (image - self.norm_mean)/(self.norm_std)
             else:
@@ -36,6 +37,7 @@ class MIPDataset(torch.utils.data.Dataset):
             self.loaded_imgs[sample_ind] = torch.unsqueeze(image, dim=0)
             mask_path = os.path.join(self.mask_folder, self.mask_files[sample_ind])
             mask = self.from_np(tifffile.imread(mask_path))
+            mask=mask.long()
             self.loaded_masks[sample_ind] = torch.unsqueeze(mask, dim=0)
             
     def __len__(self):
@@ -49,7 +51,10 @@ class MIPDataset(torch.utils.data.Dataset):
             image=self.transform(image)
             torch.manual_seed(seed)
             mask = self.transform(mask)
-        return image,mask
+            #print(mask.dtype)
+            #print(mask.shape)
+            #print(mask.squeeze(axis=0).shape)
+        return image,mask.squeeze(axis=0)
 
 #saves a demoimage in main folder
 #visualize.visualize(images[120],masks[120])
