@@ -42,8 +42,8 @@ class MIPDataset(torch.utils.data.Dataset):
         res={"image": image, "mask": mask}
         return res
 
-    
-visualize.visualize(images[100],masks[100])
+#saves a demoimage in main folder
+#visualize.visualize(images[120],masks[120])
 
 myQPIdataset=MIPDataset(images,masks)
 batch_size = 5

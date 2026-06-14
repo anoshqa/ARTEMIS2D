@@ -6,3 +6,4 @@ def visualize(im1,im2):
     plt.subplot(122)
     plt.imshow(im2)  # TODO
     plt.tight_layout()
+    plt.savefig('demoimage.png')
