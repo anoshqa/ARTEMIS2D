@@ -1,5 +1,5 @@
 import visualize
-import data
+import dataset
 import torch
 from torch.utils.data import DataLoader
 import skimage
@@ -10,7 +10,6 @@ import torch.nn as nn
 import os
 import torchvision.transforms.v2 as transforms_v2
 import file_charactersmatch as filetest
-import shape_match as shape_match
 import torch.nn.functional as F
 
 
@@ -42,8 +41,8 @@ val_image_files = image_files[num_train_image_files:] # YOUR CODE HERE
 val_mask_files = mask_files[num_train_mask_files:] # YOUR CODE HERE
 
 
-trainQPIdataset=data.MIPDataset(image_folder,mask_folder,train_image_files, train_mask_files,transform=transforms_v2.Resize((832,832))) #original image is 836,836
-validationQPIdataset=data.MIPDataset(image_folder,mask_folder,val_image_files, val_mask_files,transform=transforms_v2.Resize((832,832)))
+trainQPIdataset=dataset.MIPDataset(image_folder,mask_folder,train_image_files, train_mask_files,transform=transforms_v2.Resize((832,832))) #original image is 836,836
+validationQPIdataset=dataset.MIPDataset(image_folder,mask_folder,val_image_files, val_mask_files,transform=transforms_v2.Resize((832,832)))
 
 train_loader=DataLoader(trainQPIdataset, batch_size=8, shuffle=True)
 val_loader=DataLoader(validationQPIdataset, batch_size=8,shuffle=True)
