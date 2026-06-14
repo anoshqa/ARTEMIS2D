@@ -46,7 +46,6 @@ def validate(
         # iterate over validation loader and update loss and metric values
         for x, y in loader:
             x, y = x.to(device), y.to(device)
-            # TODO: evaluate this example with the given loss and metric
             prediction = model(x)
             # We *usually* want the target to be the same type as the prediction
             # however this is very dependent on your choice of loss function and
