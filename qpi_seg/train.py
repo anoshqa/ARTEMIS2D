@@ -61,7 +61,7 @@ batch_image,batch_mask=next(iter(train_loader))
 
 
 myUnet = UNet(depth=4,in_channels=1,out_channels=5, num_fmaps=32).to(device)
-loss=nn.CrossEntropyLoss()
+loss=nn.CrossEntropyLoss(label_smoothing=0.0)
 optimizer=torch.optim.Adam(myUnet.parameters())
 logger = SummaryWriter("runs/Unet")
 
@@ -76,7 +76,7 @@ class DiceCoefficient(nn.Module):
         return numerator / denominator.clamp(min=self.eps)
 
 dice=DiceCoefficient()
-for epoch in range(3):
+for epoch in range(10):
     train_model.train_model(myUnet, train_loader, optimizer, loss, epoch, device=device,tb_logger=logger)
     step= epoch * len(train_loader)
     validate.validate(myUnet,val_loader,loss,dice,step=step,device=device,tb_logger=logger)

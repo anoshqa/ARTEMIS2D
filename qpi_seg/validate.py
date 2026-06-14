@@ -68,10 +68,10 @@ def validate(
         )
         # we always log the last validation images
         tb_logger.add_images(tag="val_input", img_tensor=x.to("cpu"), global_step=step)
-        tb_logger.add_images(tag="val_target", img_tensor=y.unsqueeze(dim=0).to("cpu"), global_step=step)
-        #tb_logger.add_images(
-        #    tag="val_prediction", img_tensor=prediction.to("cpu"), global_step=step
-        #)
+        tb_logger.add_images(tag="val_target", img_tensor=y[:,:3,:,:].to("cpu"), global_step=step)
+        tb_logger.add_images(
+            tag="val_prediction", img_tensor=prediction[:,:3,:,:].to("cpu"), global_step=step
+        )
 
     print(
         "\nValidate: Average loss: {:.4f}, Average Metric: {:.4f}\n".format(

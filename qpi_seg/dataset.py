@@ -54,6 +54,7 @@ class MIPDataset(torch.utils.data.Dataset):
             mask = self.transform(mask)
             #print(mask.dtype)
             #print(mask.shape)
+            mask=mask.float()
             #print(mask.squeeze(axis=0).shape)
         return image,mask
 
