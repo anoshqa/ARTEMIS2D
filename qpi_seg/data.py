@@ -3,21 +3,33 @@ import torch
 import torchvision.transforms as transforms
 import skimage
 from torch.utils.data import DataLoader
+import matplotlib.pyplot as plt
+import file_charactersmatch as filetest
+import shape_match as shape_match
+import visualize
 
 mipfolder=r'/mnt/efs/dl_jrc/student_data/S-DC/MIP_padded_final'
 maskfolder=r'/mnt/efs/dl_jrc/student_data/S-DC/Masks_padded_final'
 mipfiles=[]
-for files in os.listdir(mipfolder):
+mip_justnames=sorted(os.listdir(mipfolder))
+mask_justnames=sorted(os.listdir(maskfolder))
+
+for files in mip_justnames:
     f=os.path.join(mipfolder,files)
     mipfiles.append(f)
+    
 
 maskfiles=[]
-for files in os.listdir(maskfolder):
+for files in mask_justnames:
     f=os.path.join(maskfolder,files)
     maskfiles.append(f)
-    
-print(len(mipfiles))
 
+images = [skimage.io.imread(file) for file in mipfiles]
+masks= [skimage.io.imread(file) for file in maskfiles]
+if filetest.filetest(mip_justnames, mask_justnames)==True and shape_match.matchtest(images,masks)==True:
+    print("File names (first 30 characters) and shapes match throughout")
+else:
+    print("Check files again as there is a mismatch")
 class MIPDataset(torch.utils.data.Dataset):
     def __init__(self, images, masks):
         self.images=images
@@ -30,8 +42,9 @@ class MIPDataset(torch.utils.data.Dataset):
         res={"image": image, "mask": mask}
         return res
 
-images = [skimage.io.imread(file) for file in mipfiles]
-masks= [skimage.io.imread(file) for file in maskfiles]
+    
+visualize.visualize(images[100],masks[100])
+
 myQPIdataset=MIPDataset(images,masks)
 batch_size = 5
 data_loader = DataLoader(myQPIdataset, batch_size=batch_size,shuffle=True)
