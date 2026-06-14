@@ -8,6 +8,7 @@ import visualize
 import tifffile
 from tqdm import tqdm
 import torchvision.transforms.v2 as transforms_v2
+import qpi_seg.split_mask_5_channels as split
     
 class MIPDataset(torch.utils.data.Dataset):
     def __init__(self, image_folder, mask_folder, image_files, mask_files,transform=None,norm_setting="Dataset",norm_mean=None, norm_std=None):
@@ -37,8 +38,8 @@ class MIPDataset(torch.utils.data.Dataset):
             self.loaded_imgs[sample_ind] = torch.unsqueeze(image, dim=0)
             mask_path = os.path.join(self.mask_folder, self.mask_files[sample_ind])
             mask = self.from_np(tifffile.imread(mask_path))
-            mask=mask.long()
-            self.loaded_masks[sample_ind] = torch.unsqueeze(mask, dim=0)
+            channeled_mask = split.split_into_channels(mask)
+            self.loaded_masks[sample_ind] = channeled_mask
             
     def __len__(self):
         return self.num_samples
@@ -54,7 +55,7 @@ class MIPDataset(torch.utils.data.Dataset):
             #print(mask.dtype)
             #print(mask.shape)
             #print(mask.squeeze(axis=0).shape)
-        return image,mask.squeeze(axis=0)
+        return image,mask
 
 #saves a demoimage in main folder
 #visualize.visualize(images[120],masks[120])

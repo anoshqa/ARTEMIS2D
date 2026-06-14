@@ -12,7 +12,8 @@ import qpi_seg.file_charactersmatch as filetest
 import torch.nn.functional as F
 import qpi_seg.train_model as train_model
 import qpi_seg.validate as validate
-import qpi_seg.dicecoefficient as DC
+import qpi_seg.launch_tensorboard as LT
+#import qpi_seg.dicecoefficient as DC
 import subprocess
 import qpi_seg.mean_fn as mean
 from torch.utils.tensorboard import SummaryWriter
@@ -59,34 +60,23 @@ batch_image,batch_mask=next(iter(train_loader))
 #visualize.visualize(batch_image.squeeze(),batch_mask.squeeze())
 
 
-myUnet = UNet(depth=4,in_channels=1,out_channels=5, num_fmaps=4).to(device)
+myUnet = UNet(depth=4,in_channels=1,out_channels=5, num_fmaps=32).to(device)
 loss=nn.CrossEntropyLoss()
 optimizer=torch.optim.Adam(myUnet.parameters())
 logger = SummaryWriter("runs/Unet")
 
+class DiceCoefficient(nn.Module):
+    def __init__(self, eps=1e-6):
+        super().__init__()
+        self.eps = eps
+
+    def forward(self, prediction, target):
+        numerator = 2 * (prediction * target).sum()
+        denominator = (prediction ** 2).sum() + (target ** 2).sum()
+        return numerator / denominator.clamp(min=self.eps)
+
+dice=DiceCoefficient()
 for epoch in range(3):
     train_model.train_model(myUnet, train_loader, optimizer, loss, epoch, device=device,tb_logger=logger)
     step= epoch * len(train_loader)
-    validate(myUnet,val_loader,loss_function=torch.nn.MSELoss(),metric=DC.DiceCoefficient(),step=step,device=device,tb_logger=logger)
-
-
-
-
-# Function to find an available port and launch TensorBoard on the browser
-def launch_tensorboard(log_dir):
-    import socket
-
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind(("", 0))
-        port = s.getsockname()[1]
-
-    tensorboard_cmd = f"tensorboard --logdir={log_dir} --port={port}"
-    process = subprocess.Popen(tensorboard_cmd, shell=True)
-    print(
-        f"TensorBoard started at http://localhost:{port}. \n"
-        "If you are using VSCode remote session, forward the port using the PORTS tab next to TERMINAL."
-    )
-    return process
-
-
-launch_tensorboard("runs")
+    validate.validate(myUnet,val_loader,loss,dice,step=step,device=device,tb_logger=logger)

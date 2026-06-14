@@ -32,10 +32,7 @@ def train_model(
         # if necessary, crop the masks to match the model output shape
         if prediction.shape[-2:] != y.shape[-2:]:
             raise RuntimeError
-        #if y.dtype != prediction.dtype:
-        #    y = y.type(prediction.dtype)
-        #print(y.shape)
-        #print(prediction.shape)
+      
         loss = loss_function(prediction, y)
 
         # backpropagate the loss and adjust the parameters
@@ -61,17 +58,20 @@ def train_model(
             # check if we log images in this iteration
             if step % log_image_interval == 0:
                 #x = unnormalize(x)
+                #print(x.shape)
+                #print(y.shape)
                 tb_logger.add_images(
                     tag="image", img_tensor=x.to("cpu"), global_step=step
                 )
+                
                 tb_logger.add_images(
-                    tag="mask", img_tensor=y.to("cpu"), global_step=step
+                    tag="mask", img_tensor=y.unsqueeze(dim=0).to("cpu"), global_step=step
                 )
-                tb_logger.add_images(
-                    tag="prediction",
-                    img_tensor=prediction.to("cpu").detach(),
-                    global_step=step,
-                )
+                #tb_logger.add_images(
+                #    tag="prediction",
+                #    img_tensor=prediction.squeeze(dim=2).to("cpu").detach(),
+                #    global_step=step,
+                #)
                 #combined_image = torch.cat(
                 #    [x, pad_to_size(y, x.size()), pad_to_size(prediction, x.size())],
                 #    dim=3,
