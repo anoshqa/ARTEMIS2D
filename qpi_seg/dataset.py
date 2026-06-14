@@ -6,8 +6,9 @@ import file_charactersmatch as filetest
 import shape_match as shape_match
 import visualize
 import PIL.Image as Image
+import skimage
 import tifffile
-import tqdm
+from tqdm import tqdm
 import torchvision.transforms.v2 as transforms_v2
     
 class MIPDataset(torch.utils.data.Dataset):
@@ -25,10 +26,10 @@ class MIPDataset(torch.utils.data.Dataset):
         for sample_ind in tqdm(range(self.num_samples),desc="Reading images"):
             img_path = os.path.join(self.image_folder, self.image_files[sample_ind])
             image = self.from_np(tifffile.imread(img_path))
-            self.loaded_imgs[sample_ind] = image
+            self.loaded_imgs[sample_ind] = torch.unsqueeze(image, dim=0)
             mask_path = os.path.join(self.mask_folder, self.mask_files[sample_ind])
             mask = self.from_np(tifffile.imread(mask_path))
-            self.loaded_masks[sample_ind] = mask
+            self.loaded_masks[sample_ind] = torch.unsqueeze(mask, dim=0)
         
     def __len__(self):
         return self.num_samples
