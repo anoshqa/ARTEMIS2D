@@ -1,4 +1,5 @@
 import torch
+import numpy as np
 def validate(
     model,
     loader,
@@ -39,7 +40,7 @@ def validate(
 
     # running loss and metric values
     val_loss = 0
-    val_metric = 0
+    val_metric =[]
 
     # disable gradients during validation
     with torch.no_grad():
@@ -51,21 +52,34 @@ def validate(
             # however this is very dependent on your choice of loss function and
             # metric. If you get errors such as "RuntimeError: Found dtype Float but expected Short"
             # then this is where you should look.
-            val_loss += loss_function(prediction,y) # TODO
-            val_metric += metric(prediction,y) # TODO
+            val_loss += loss_function(prediction,y) 
+            
+            val_metric.append(metric(prediction,y)) # TODO
 
     # normalize loss and metric
     val_loss /= len(loader)
-    val_metric /= len(loader)
+    #print(val_metric.dtype)
+    #print(val_metric)
+    val_metric_ch0= [sublist[0].cpu().numpy() for sublist in val_metric]
+    val_metric_ch1= [sublist[1].cpu().numpy() for sublist in val_metric]
+    val_metric_ch2= [sublist[2].cpu().numpy() for sublist in val_metric]
+    val_metric_ch3= [sublist[3].cpu().numpy() for sublist in val_metric]
+    val_metric_ch4= [sublist[4].cpu().numpy() for sublist in val_metric]
+    average_val_metric_ch0= np.mean(val_metric_ch0)
+    average_val_metric_ch1=np.mean(val_metric_ch1)
+    average_val_metric_ch2=np.mean(val_metric_ch2)
+    average_val_metric_ch3=np.mean(val_metric_ch3)
+    average_val_metric_ch4=np.mean(val_metric_ch4)
 
+    
     if tb_logger is not None:
         assert (
             step is not None
         ), "Need to know the current step to log validation results"
         tb_logger.add_scalar(tag="val_loss", scalar_value=val_loss, global_step=step)
-        tb_logger.add_scalar(
-            tag="val_metric", scalar_value=val_metric, global_step=step
-        )
+        #tb_logger.add_scalar(
+        #    tag="val_metric", scalar_value=val_metric, global_step=step
+        #)
         # we always log the last validation images
         tb_logger.add_images(tag="val_input", img_tensor=x.to("cpu"), global_step=step)
         tb_logger.add_images(tag="val_target", img_tensor=y[:,:3,:,:].to("cpu"), global_step=step)
@@ -74,7 +88,7 @@ def validate(
         )
 
     print(
-        "\nValidate: Average loss: {:.4f}, Average Metric: {:.4f}\n".format(
-            val_loss, val_metric
+        "\nValidate: Average loss: {:.4f}, Average Metric Ch1: {:.4f}\n,Average Metric Ch2: {:.4f}\n, Average Metric Ch3: {:.4f}\n, Average Metric Ch4: {:.4f}\n, Average Metric Ch5: {:.4f}\n".format(
+            val_loss, average_val_metric_ch0,average_val_metric_ch1,average_val_metric_ch2,average_val_metric_ch3,average_val_metric_ch4
         )
     )

@@ -45,16 +45,16 @@ def train_model(
         if batch_id % 20 == 0 or batch_id == len(loader) - 1:
             print(f"Epoch: {epoch} - Batch: {batch_id}/{len(loader)} - Loss: {loss.item()}")
             tb_logger.add_scalar(tag="train_loss", scalar_value=loss, global_step=epoch * len(loader) + batch_id)
-        if batch_id % log_interval == 0:
-            print(
-                "Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}".format(
-                    epoch,
-                    batch_id * len(x),
-                    len(loader.dataset),
-                    100.0 * batch_id / len(loader),
-                    loss.item(),
-                )
-            )
+        #if batch_id % log_interval == 0:
+        #    print(
+        #        "Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}".format(
+        #            epoch,
+        #            batch_id * len(x),
+        #            len(loader.dataset),
+        #            100.0 * batch_id / len(loader),
+        #            loss.item(),
+        #        )
+        #    )
 
         # log to tensorboard
         if tb_logger is not None:

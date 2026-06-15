@@ -48,18 +48,18 @@ val_mask_files = mask_files[num_train_mask_files:] # YOUR CODE HERE
 
 
 #train_mean, train_std= mean.mean_fn(image_folder,train_image_files)
-weights = CW.calculate_weights(mask_folder,train_mask_files)
-print(weights)
+weight_for_loss_balance= CW.calculate_weights(mask_folder,train_mask_files)
+
 #print(train_mean,train_std)
 transform = transforms_v2.Compose([
-    transforms_v2.Resize((832,832),interpolation=transforms_v2.InterpolationMode.NEAREST),
+    transforms_v2.Resize((256,256),interpolation=transforms_v2.InterpolationMode.NEAREST,antialias=True),
     transforms_v2.RandomHorizontalFlip(p=0.5),
     transforms_v2.RandomVerticalFlip(p=0.5),
-    transforms_v2.RandomCrop((256,256)),
+    transforms_v2.RandomResizedCrop((128,128),antialias=True,scale=(0.75,1.25)),
     transforms_v2.RandomRotation([-90,90])
 ])
 trainQPIdataset=qpi_seg.dataset.MIPDataset(image_folder,mask_folder,train_image_files, train_mask_files,transform=transform,norm_setting="Dataset_min_max",norm_mean=None, norm_std=None,norm_min=13390,norm_max=14000) #original image is 836,836
-validationQPIdataset=qpi_seg.dataset.MIPDataset(image_folder,mask_folder,val_image_files, val_mask_files,transform=transform,interpolation=transforms_v2.InterpolationMode.NEAREST),norm_setting="Dataset_min_max",norm_mean=None, norm_std=None,norm_min=13390,norm_max=14000)
+validationQPIdataset=qpi_seg.dataset.MIPDataset(image_folder,mask_folder,val_image_files, val_mask_files,transform=transforms_v2.Resize((832,832),interpolation=transforms_v2.InterpolationMode.NEAREST),norm_setting="Dataset_min_max",norm_mean=None, norm_std=None,norm_min=13390,norm_max=14000)
 
 train_loader=DataLoader(trainQPIdataset, batch_size=4, shuffle=True)
 val_loader=DataLoader(validationQPIdataset, batch_size=4,shuffle=True)
@@ -69,25 +69,34 @@ batch_image,batch_mask=next(iter(train_loader))
 #visualize.visualize(batch_image.squeeze(),batch_mask.squeeze())
 
 
-myUnet = UNet(depth=5,in_channels=1,out_channels=5, num_fmaps=32,final_activation=nn.Softmax()).to(device)
-loss=nn.CrossEntropyLoss(weight = weights.to(device), label_smoothing=0.0)
+myUnet = UNet(depth=4,in_channels=1,out_channels=5, num_fmaps=32,final_activation=nn.Softmax()).to(device)
+loss=nn.CrossEntropyLoss(weight = weight_for_loss_balance.to(device), label_smoothing=0.0)
 optimizer=torch.optim.Adam(myUnet.parameters(),lr=1e-5)
 logger = SummaryWriter("runs/Corrected_tensorboard")
 
-class DiceCoefficient(nn.Module):
+class multiclassDiceCoefficient(nn.Module):
     def __init__(self, eps=1e-6):
         super().__init__()
         self.eps = eps
-
+    dice_coeffs=list()
     def forward(self, prediction, target):
-        numerator = 2 * (prediction * target).sum()
-        denominator = (prediction ** 2).sum() + (target ** 2).sum()
-        return numerator / denominator.clamp(min=self.eps)
+        dice_coeffs=list()
+        for i in range(prediction.size(dim=1)):
+            numerator = 2 * (prediction[:,i,:,:] * target[:,i,:,:]).sum()
+            denominator = (prediction ** 2).sum() + (target ** 2).sum()
+            dice_coeffs.append(numerator / denominator.clamp(min=self.eps))
+        return dice_coeffs
 
-dice=DiceCoefficient()
+#class IoU_foreground(nn.Module):
+#    def __init__(self,eps=1e-6):
+#        super().__init__()
+#        self.eps=eps
+#    def forward(self,prediction,target):
+        
+dice_list=multiclassDiceCoefficient()
 for epoch in range(20):
     train_model.train_model(myUnet, train_loader, optimizer, loss, epoch, device=device,tb_logger=logger)
     step= epoch * len(train_loader)
-    validate.validate(myUnet,val_loader,loss,dice,step=step,device=device,tb_logger=logger)
+    validate.validate(myUnet,val_loader,loss,dice_list,step=step,device=device,tb_logger=logger)
 
 

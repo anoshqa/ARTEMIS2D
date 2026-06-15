@@ -72,6 +72,7 @@ class ConvBlock(torch.nn.Module):
             torch.nn.Conv2d(
                 in_channels, out_channels, kernel_size=kernel_size, padding=padding
             ),
+            #torch.nn.
             torch.nn.ReLU(),
             torch.nn.Conv2d(
                 out_channels, out_channels, kernel_size=kernel_size, padding=padding
