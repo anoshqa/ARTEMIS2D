@@ -71,10 +71,27 @@ def train_model(
                     tag="image", img_tensor=x.to("cpu"), global_step=step
                 )
                 #print(y.shape)
+                channel1=y.detach().to('cpu')[:,0,:,:]
+                channel2=y.detach().to('cpu')[:,1,:,:]
+                channel3=y.detach().to('cpu')[:,2,:,:]
+                channel4=y.detach().to('cpu')[:,3,:,:]
+                channel5=y.detach().to('cpu')[:,4,:,:]
+               
+                concat_channel1_images= torch.cat([channel1,channel2,channel3,channel4,channel5],dim=0)
+                concat_channel1_reshaped=concat_channel1_images.unsqueeze(dim=1)
+                
+                #print(concat_channel1_reshaped.shape)
                 tb_logger.add_images(
-                    tag="mask", img_tensor=y[:,:3,:,:].to("cpu"), global_step=step
+                    tag="masks", img_tensor=concat_channel1_reshaped, global_step=step
                 )
-                tb_logger.add_images(tag="prediction",img_tensor=prediction[:,:3,:,:].to("cpu").detach(),global_step=step)
+                pred_ch1=prediction.detach().to('cpu')[:,0,:,:]
+                pred_ch2=prediction.detach().to('cpu')[:,1,:,:]
+                pred_ch3=prediction.detach().to('cpu')[:,2,:,:]
+                pred_ch4=prediction.detach().to('cpu')[:,3,:,:]
+                pred_ch5=prediction.detach().to('cpu')[:,4,:,:]
+                concat_pred_channel1_images= torch.cat([pred_ch1,pred_ch2,pred_ch3,pred_ch4,pred_ch5],dim=0)
+                concat_pred_channel1_reshaped=concat_pred_channel1_images.unsqueeze(dim=1)
+                tb_logger.add_images(tag="prediction",img_tensor=concat_pred_channel1_reshaped,global_step=step)
                 #combined_image = torch.cat(
                 #    [x, pad_to_size(y, x.size()), pad_to_size(prediction, x.size())],
                 #    dim=3,
