@@ -1,6 +1,7 @@
 import numpy as np
 import torch
 def split_into_channels(mask):
+    mask=mask.squeeze()
     mask_h=mask.shape[0]
     mask_w=mask.shape[1]
     background_mask=mask==0

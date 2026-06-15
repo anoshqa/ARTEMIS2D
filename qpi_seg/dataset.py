@@ -42,9 +42,12 @@ class MIPDataset(torch.utils.data.Dataset):
             self.loaded_imgs[sample_ind] = torch.unsqueeze(image, dim=0)
             mask_path = os.path.join(self.mask_folder, self.mask_files[sample_ind])
             mask = self.from_np(tifffile.imread(mask_path))
-            channeled_mask = split.split_into_channels(mask)
-            self.loaded_masks[sample_ind] = channeled_mask
+            #channeled_mask = split.split_into_channels(mask)
+            #self.loaded_masks[sample_ind] = channeled_mask
+            #print(mask.dtype)
             
+            mask=mask.to(torch.int64)
+            self.loaded_masks[sample_ind] = torch.unsqueeze(mask,dim=0)
     def __len__(self):
         return self.num_samples
     def __getitem__(self, idx):
@@ -56,9 +59,10 @@ class MIPDataset(torch.utils.data.Dataset):
             image=self.transform(image)
             torch.manual_seed(seed)
             mask = self.transform(mask)
+            channeled_mask=split.split_into_channels(mask)
             #print(mask.dtype)
             #print(mask.shape)
-            mask=mask.float()
+            mask=channeled_mask.float()
             #print(mask.squeeze(axis=0).shape)
         return image,mask
 

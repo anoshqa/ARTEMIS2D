@@ -29,6 +29,9 @@ def train_model(
 
         # apply model and calculate loss
         prediction = model(x)
+        predictioncopy=prediction.clone().detach()
+        predictioncopy[predictioncopy>=0.5]=1
+        predictioncopy[predictioncopy<0.5]=0
         # if necessary, crop the masks to match the model output shape
         if prediction.shape[-2:] != y.shape[-2:]:
             raise RuntimeError
@@ -84,11 +87,11 @@ def train_model(
                 tb_logger.add_images(
                     tag="masks", img_tensor=concat_channel1_reshaped, global_step=step
                 )
-                pred_ch1=prediction.detach().to('cpu')[:,0,:,:]
-                pred_ch2=prediction.detach().to('cpu')[:,1,:,:]
-                pred_ch3=prediction.detach().to('cpu')[:,2,:,:]
-                pred_ch4=prediction.detach().to('cpu')[:,3,:,:]
-                pred_ch5=prediction.detach().to('cpu')[:,4,:,:]
+                pred_ch1=predictioncopy.to('cpu')[:,0,:,:]
+                pred_ch2=predictioncopy.to('cpu')[:,1,:,:]
+                pred_ch3=predictioncopy.to('cpu')[:,2,:,:]
+                pred_ch4=predictioncopy.to('cpu')[:,3,:,:]
+                pred_ch5=predictioncopy.to('cpu')[:,4,:,:]
                 concat_pred_channel1_images= torch.cat([pred_ch1,pred_ch2,pred_ch3,pred_ch4,pred_ch5],dim=0)
                 concat_pred_channel1_reshaped=concat_pred_channel1_images.unsqueeze(dim=1)
                 tb_logger.add_images(tag="prediction",img_tensor=concat_pred_channel1_reshaped,global_step=step)

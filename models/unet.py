@@ -72,11 +72,12 @@ class ConvBlock(torch.nn.Module):
             torch.nn.Conv2d(
                 in_channels, out_channels, kernel_size=kernel_size, padding=padding
             ),
-            #torch.nn.
+            torch.nn.BatchNorm2d(num_features=out_channels),
             torch.nn.ReLU(),
             torch.nn.Conv2d(
                 out_channels, out_channels, kernel_size=kernel_size, padding=padding
             ),
+            torch.nn.BatchNorm2d(num_features=out_channels),
             torch.nn.ReLU(),
         )
 
@@ -138,6 +139,10 @@ class OutputConv(torch.nn.Module):
         x = self.final_conv(x)
         if self.activation is not None:
             x = self.activation(x)
+        #APPLY THRESHOLD
+        #x[x>=0.5]=1
+        #x[x<0.5]=0
+        
         return x
 # Put it together in a class unet
 
