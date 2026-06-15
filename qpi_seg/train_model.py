@@ -41,6 +41,10 @@ def train_model(
         # backpropagate the loss and adjust the parameters
         loss.backward()
         optimizer.step()
+        
+        if batch_id % 20 == 0 or batch_id == len(loader) - 1:
+            print(f"Epoch: {epoch} - Batch: {batch_id}/{len(loader)} - Loss: {loss.item()}")
+            tb_logger.add_scalar(tag="train_loss", scalar_value=loss, global_step=epoch * len(loader) + batch_id)
         if batch_id % log_interval == 0:
             print(
                 "Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}".format(
@@ -55,9 +59,9 @@ def train_model(
         # log to tensorboard
         if tb_logger is not None:
             step = epoch * len(loader) + batch_id
-            tb_logger.add_scalar(
-                tag="train_loss", scalar_value=loss.item(), global_step=step
-            )
+            #tb_logger.add_scalar(
+            #    tag="train_loss", scalar_value=loss.item(), global_step=step
+            #)
             # check if we log images in this iteration
             if step % log_image_interval == 0:
                 #x = unnormalize(x)

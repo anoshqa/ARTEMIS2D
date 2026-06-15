@@ -46,24 +46,24 @@ val_image_files = image_files[num_train_image_files:] # YOUR CODE HERE
 val_mask_files = mask_files[num_train_mask_files:] # YOUR CODE HERE
 
 
-train_mean, train_std= mean.mean_fn(image_folder,train_image_files)
+#train_mean, train_std= mean.mean_fn(image_folder,train_image_files)
 
-print(train_mean,train_std)
-trainQPIdataset=qpi_seg.dataset.MIPDataset(image_folder,mask_folder,train_image_files, train_mask_files,transform=transforms_v2.Resize((832,832),interpolation=transforms_v2.InterpolationMode.NEAREST),norm_setting="Dataset",norm_mean=train_mean, norm_std=train_std) #original image is 836,836
-validationQPIdataset=qpi_seg.dataset.MIPDataset(image_folder,mask_folder,val_image_files, val_mask_files,transform=transforms_v2.Resize((832,832),interpolation=transforms_v2.InterpolationMode.NEAREST),norm_setting="Dataset",norm_mean=train_mean, norm_std=train_std)
+#print(train_mean,train_std)
+trainQPIdataset=qpi_seg.dataset.MIPDataset(image_folder,mask_folder,train_image_files, train_mask_files,transform=transforms_v2.Resize((832,832),interpolation=transforms_v2.InterpolationMode.NEAREST),norm_setting="Dataset_min_max",norm_mean=None, norm_std=None,norm_min=13390,norm_max=14000) #original image is 836,836
+validationQPIdataset=qpi_seg.dataset.MIPDataset(image_folder,mask_folder,val_image_files, val_mask_files,transform=transforms_v2.Resize((832,832),interpolation=transforms_v2.InterpolationMode.NEAREST),norm_setting="Dataset_min_max",norm_mean=None, norm_std=None,norm_min=13390,norm_max=14000)
 
-train_loader=DataLoader(trainQPIdataset, batch_size=1, shuffle=True)
-val_loader=DataLoader(validationQPIdataset, batch_size=1,shuffle=True)
+train_loader=DataLoader(trainQPIdataset, batch_size=4, shuffle=True)
+val_loader=DataLoader(validationQPIdataset, batch_size=4,shuffle=True)
 batch_image,batch_mask=next(iter(train_loader))
 #print(batch_image.shape)
 #print(batch_mask.shape)
 #visualize.visualize(batch_image.squeeze(),batch_mask.squeeze())
 
 
-myUnet = UNet(depth=4,in_channels=1,out_channels=5, num_fmaps=32).to(device)
+myUnet = UNet(depth=5,in_channels=1,out_channels=5, num_fmaps=32,final_activation=nn.Softmax()).to(device)
 loss=nn.CrossEntropyLoss(label_smoothing=0.0)
 optimizer=torch.optim.Adam(myUnet.parameters())
-logger = SummaryWriter("runs/Unet")
+logger = SummaryWriter("runs/Unet_perimagenorm")
 
 class DiceCoefficient(nn.Module):
     def __init__(self, eps=1e-6):
@@ -76,7 +76,9 @@ class DiceCoefficient(nn.Module):
         return numerator / denominator.clamp(min=self.eps)
 
 dice=DiceCoefficient()
-for epoch in range(10):
+for epoch in range(50):
     train_model.train_model(myUnet, train_loader, optimizer, loss, epoch, device=device,tb_logger=logger)
     step= epoch * len(train_loader)
     validate.validate(myUnet,val_loader,loss,dice,step=step,device=device,tb_logger=logger)
+
+

@@ -11,7 +11,7 @@ import torchvision.transforms.v2 as transforms_v2
 import qpi_seg.split_mask_5_channels as split
     
 class MIPDataset(torch.utils.data.Dataset):
-    def __init__(self, image_folder, mask_folder, image_files, mask_files,transform=None,norm_setting="Dataset",norm_mean=None, norm_std=None):
+    def __init__(self, image_folder, mask_folder, image_files, mask_files,transform=None,norm_setting="",norm_mean=None, norm_std=None,norm_min=None,norm_max=None):
         self.image_folder=image_folder
         self.mask_folder=mask_folder
         self.image_files=image_files
@@ -23,6 +23,8 @@ class MIPDataset(torch.utils.data.Dataset):
         self.loaded_masks=[None]*self.num_samples
         self.norm_mean=norm_mean
         self.norm_std=norm_std
+        self.norm_min=norm_min
+        self.norm_max=norm_max
         #norm_setting varies between dataset or per image
         self.from_np = transforms_v2.Lambda(lambda x: torch.from_numpy(x))
         for sample_ind in tqdm(range(self.num_samples),desc="Reading images"):
@@ -31,6 +33,8 @@ class MIPDataset(torch.utils.data.Dataset):
             image=image.float()
             if norm_setting =="Dataset":
                 image = (image - self.norm_mean)/(self.norm_std)
+            if norm_setting=="Dataset_min_max":
+                image = (image -self.norm_min)/(self.norm_max - self.norm_min)
             else:
                 image_mean = torch.mean(image)
                 image_std = torch.std(image)
