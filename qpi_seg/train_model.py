@@ -58,6 +58,15 @@ def train_model(
         #            loss.item(),
         #        )
         #    )
+        
+        if epoch % 10 ==0:
+            checkpoint = {
+            'epoch': epoch,
+            'model_state_dict': model.state_dict(),
+            'optimizer_state_dict': optimizer.state_dict(),
+            'loss': loss,
+            }
+            torch.save(checkpoint, f'/home/S-DC/ARTEMIS2D/checkpoints_unet1/checkpoint_epoch_{epoch}.pt')   
 
         # log to tensorboard
         if tb_logger is not None:
@@ -95,17 +104,5 @@ def train_model(
                 concat_pred_channel1_images= torch.cat([pred_ch1,pred_ch2,pred_ch3,pred_ch4,pred_ch5],dim=0)
                 concat_pred_channel1_reshaped=concat_pred_channel1_images.unsqueeze(dim=1)
                 tb_logger.add_images(tag="prediction",img_tensor=concat_pred_channel1_reshaped,global_step=step)
-                #combined_image = torch.cat(
-                #    [x, pad_to_size(y, x.size()), pad_to_size(prediction, x.size())],
-                #    dim=3,
-                #)
-
-                #tb_logger.add_images(
-                #    tag="input_target_prediction",
-                #    img_tensor=combined_image,
-                #    global_step=step,
-                #)
-
-        if early_stop and batch_id > 5:
-            print("Stopping test early!")
-            break
+        
+        

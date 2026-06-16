@@ -10,6 +10,7 @@ __pycache__/
 # other
 .vscode
 runs/*
+checkpoints_unet1/*
 
 # Distribution / packaging
 .Python

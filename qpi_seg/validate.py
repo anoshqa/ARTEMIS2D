@@ -57,7 +57,7 @@ def validate(
             # then this is where you should look.
             val_loss += loss_function(prediction,y) 
             
-            val_metric.append(metric(prediction,y)) # TODO
+            val_metric.append(metric(prediction,y)) # TODO: MAKE IT as predictioncopy
 
     # normalize loss and metric
     val_loss /= len(loader)
