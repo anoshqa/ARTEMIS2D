@@ -70,7 +70,7 @@ batch_image,batch_mask=next(iter(train_loader))
 #visualize.visualize(batch_image.squeeze(),batch_mask.squeeze())
 
 
-myUnet = UNet(depth=7,in_channels=1,out_channels=5, num_fmaps=32,final_activation=nn.Softmax()).to(device)
+myUnet = UNet(depth=6,in_channels=1,out_channels=5, num_fmaps=32,final_activation=nn.Softmax()).to(device)
 loss=nn.CrossEntropyLoss(weight = weight_for_loss_balance.to(device), label_smoothing=0.0)
 optimizer=torch.optim.AdamW(myUnet.parameters(),lr=1e-4)
 logger = SummaryWriter("runs/Batch_norm")
@@ -95,7 +95,7 @@ class multiclassDiceCoefficient(nn.Module):
 #    def forward(self,prediction,target):
         
 dice_list=multiclassDiceCoefficient()
-for epoch in range(1):
+for epoch in range(200):
     train_model.train_model(myUnet, train_loader, optimizer, loss, epoch, device=device,tb_logger=logger)
     step= epoch * len(train_loader) 
     validate.validate(myUnet,val_loader,loss,dice_list,step=step,device=device,tb_logger=logger)
