@@ -9,14 +9,25 @@ from skimage.measure import label, regionprops
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt 
+import qpi_seg.visualize as vs
 
+#actually you put unseen image
 images_folder=r'/mnt/efs/dl_jrc/student_data/S-DC/MIP_unseen_padded'
+
+
 cellpose_mask_folder=r'/mnt/efs/dl_jrc/student_data/S-DC/Masks_unseen_cellpose'
-unet_mask_folder=r'/mnt/efs/dl_jrc/student_data/S-DC/Masks_unseen_unet'
+
+unet_mask_folder=r'/mnt/efs/dl_jrc/student_data/S-DC/Masks_padded_final'
 
 images=[tifffile.imread(os.path.join(images_folder,file)) for file in os.listdir(images_folder)]
 cp_masks=[tifffile.imread(os.path.join(cellpose_mask_folder,file)) for file in os.listdir(cellpose_mask_folder)]
 unet_masks=[tifffile.imread(os.path.join(unet_mask_folder,file)) for file in os.listdir(unet_mask_folder)]
+
+#image=tifffile.imread(os.path.join(image_original,'20240316.120455.453.MDA-MB231P-020_HT2D_0.tif_submask_204.png'))
+#cp_mask=tifffile.imread(os.path.join(images_folder,'20240316.120455.453.MDA-MB231P-020_HT2D_0.tif_submask_204_cp_masks.tiff'))
+#unet_mask=tifffile.imread(os.path.join(unet_mask_folder,'20240316.120455.453.MDA-MB231P-020_HT2D_0.tif_submask_204final.png'))
+#vs.visualize(image,unet_mask,unet_mask)
+
 
 #images to natural RI range
 images_RI= [image/1e4 for image in images ]

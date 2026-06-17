@@ -9,4 +9,4 @@ def plot_grids(imgs,masks):
             
     plt.setp(plt.gcf().get_axes(),xticks=[],yticks=[])
     plt.tight_layout()
-    plt.savefig('grids_test.png')
+    plt.savefig('grids_test.png',transparent=True)

@@ -13,8 +13,8 @@ from skimage.transform import resize
 first_model_path=r"/mnt/efs/dl_jrc/student_data/S-DC/model/models/cpmodel_baseline_50epochs"
 
 #image_folder = r'/mnt/efs/dl_jrc/student_data/S-DC/MIP_unseen_padded'
-
-#output_mask_folder = r'/mnt/efs/dl_jrc/student_data/S-DC/Masks_unseen_cellpose'
+image_folder = r'/mnt/efs/dl_jrc/student_data/S-DC/AllMIP_mask_norepeat'
+output_mask_folder = r'/mnt/efs/dl_jrc/student_data/S-DC/Masks_all_cellpose'
 
 #
 
@@ -23,9 +23,9 @@ val_image_files=os.listdir(image_folder)
 
 #val_image_files=['','','','','']
 
-val_images=[tifffile.imread(os.path.join(image_folder, file)) for file in val_image_files]
+val_images=[tifffile.imread(os.path.join(image_folder, file)) for file in val_image_files[:5]]
 
-out_file_name_stems=[os.path.splitext(file)[0]+'_cp_masks.tiff'for file in val_image_files ]
+out_file_name_stems=[os.path.splitext(file)[0]+'_cp_masks.tiff'for file in val_image_files[:5]]
 
 
 val_image_resized=[resize(image, (418,418), anti_aliasing=True,preserve_range=True) for image in val_images]
@@ -33,7 +33,7 @@ val_image_resized=[resize(image, (418,418), anti_aliasing=True,preserve_range=Tr
 cpmodel_baseline_50epochs = models.CellposeModel(gpu=True,
                                 pretrained_model=first_model_path)
 
-test_masks_output, flows, styles = cpmodel_baseline_50epochs.eval(val_image_resized, batch_size=4, normalize = True,niter=2000)
+test_masks_output, flows, styles = cpmodel_baseline_50epochs.eval(val_image_resized, batch_size=4, normalize = True,niter=2000,flow_threshold=0)
 
 
 test_masks_resized=[resize(image, (836,836),preserve_range=True,order=0) for image in test_masks_output]
@@ -47,7 +47,7 @@ for i in range(len(out_file_name_masks)):
     )
 
 #for visualiing first five masks
-import qpi_seg.plot_grids as pg
-val_image_resized_5=val_image_resized[0:5]
-test_masks=test_masks_output[0:5]
-pg.plot_grids(val_image_resized,test_masks)
+#import qpi_seg.plot_grids as pg
+#val_image_resized_5=val_image_resized[0:5]
+#test_masks=test_masks_output[0:5]
+#pg.plot_grids(val_image_resized,test_masks)

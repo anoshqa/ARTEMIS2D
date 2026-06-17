@@ -63,14 +63,14 @@ for i in range(len(test_images)):
     padded_clustermap=np.pad(clustermap,((2,2),(2,2)),'constant',constant_values=(0,0))
     clustermaps.append(padded_clustermap)
 
-for i in range(len(out_file_name_masks)):
-    tifffile.imwrite(
-        out_file_name_masks[i],
-        clustermaps[i]
-    )
+#for i in range(len(out_file_name_masks)):
+#    tifffile.imwrite(
+#        out_file_name_masks[i],
+#        clustermaps[i]
+#    )
 
 
-pg.plot_grids(test_images,  clustermaps)
+pg.plot_grids(test_images[0:5],  clustermaps[0:5])
 
 #visual_test.visualize(test_image, test_mask,padded_clustermap)
 #plt.savefig('test_predict10.png')
