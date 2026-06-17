@@ -17,31 +17,36 @@ model.load_state_dict(model_save['model_state_dict'])
 model=model.to(device)
 
 test_images_folder=r'/mnt/efs/dl_jrc/student_data/S-DC/MIP_unseen_padded'
-#test_masks_folder=r'/mnt/efs/dl_jrc/student_data/S-DC/Masks_padded_final'
 
 #TODO: Export masks to be usable by Fiji
-unet_masks_output_folder=r'/mnt/efs/dl_jrc/student_data/S-DC/output_masks'
+unet_masks_output_folder=r'/mnt/efs/dl_jrc/student_data/S-DC/Masks_unseen_unet'
 
 test_files= os.listdir(test_images_folder)
-test_images = [tifffile.imread(os.path.join(test_images_folder,test_files[i])) for i in range(5)]
-#test_mask_files= os.listdir(test_images_folder)
-#test_mask = tifffile.imread(os.path.join(test_masks_folder,test_mask_files[10]))
+test_images = [tifffile.imread(os.path.join(test_images_folder,file)) for file in test_files]
+
+
+
+out_file_name_stems=[os.path.splitext(file)[0]+'_unet_masks.tiff'for file in test_files ]
+
+out_file_name_masks=[os.path.join(unet_masks_output_folder, file) for file in out_file_name_stems]
+
 from_np=transforms_v2.Lambda(lambda x: torch.from_numpy(x))
 transform = transforms_v2.CenterCrop((832,832))
 norm_min=13300
 norm_max=14100
 model.eval()
 clustermaps=[]
-for i in range(5):
+for i in range(len(test_images)):
     torch_test_image = from_np(test_images[i])
     torch_test_image=torch_test_image.float()
     img_norm= (torch_test_image - norm_min) / (norm_max - norm_min)
     img_norm=img_norm.unsqueeze(dim=0).to(device)
     img_norm2=img_norm.unsqueeze(dim=0).to(device)
     img_norm2=transform(img_norm2)
-    torch_prediction=model(img_norm2)
+    
+    torch_prediction=model(img_norm2) #prediction
     clustermap=np.zeros((832,832))
-    torch_prediction=torch_prediction.reshape(5,832,832).detach().cpu()
+    torch_prediction=torch_prediction.reshape(5,832,832).detach().cpu() #reshape to 5 channels and detach and cpu
     ch1_prediction = torch_prediction[0,:,:]
     ch2_prediction = torch_prediction[1,:,:]
     ch3_prediction= torch_prediction[2,:,:]
@@ -57,8 +62,14 @@ for i in range(5):
     padded_clustermap=np.pad(clustermap,((2,2),(2,2)),'constant',constant_values=(0,0))
     clustermaps.append(padded_clustermap)
 
+for i in range(len(out_file_name_masks)):
+    tifffile.imwrite(
+        out_file_name_masks[i],
+        clustermaps[i]
+    )
 
-pg.plot_grids(test_images,clustermaps)
+
+pg.plot_grids(test_images,  clustermaps)
 
 #visual_test.visualize(test_image, test_mask,padded_clustermap)
 #plt.savefig('test_predict10.png')

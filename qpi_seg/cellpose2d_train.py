@@ -87,12 +87,12 @@ if __name__ == "__main__":
     cpmodel_baseline_50epochs = models.CellposeModel(gpu=True,
                                 pretrained_model=first_model_path)
     test_masks_output, flows, styles = cpmodel_baseline_50epochs.eval(val_images, batch_size=32, normalize = True)# batch size here is the maximunumber of masks 
-    ap, tp, fp, fn = metrics.average_precision(val_masks, test_masks_output)
-    print(f'average precision at iou threshold 0.5 = {ap}, \n false positives = {fp}, \n false negatives = {fn}, \n true positives = {tp}')
-    print(f'>>> average precision at iou threshold 0.5 = {ap[:,0].mean():.3f}')
+    #ap, tp, fp, fn = metrics.average_precision(val_masks, test_masks_output)
+    #print(f'average precision at iou threshold 0.5 = {ap}, \n false positives = {fp}, \n false negatives = {fn}, \n true positives = {tp}')
+    #print(f'>>> average precision at iou threshold 0.5 = {ap[:,0].mean():.3f}')
 
     timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-    np.savez(save_path/f"test_results_{timestamp}.npz", ap=ap, tp=tp, fp=fp, fn=fn, test_masks=val_masks, test_masks_output=test_masks_output)
+    #np.savez(save_path/f"test_results_{timestamp}.npz", ap=ap, tp=tp, fp=fp, fn=fn, test_masks=val_masks, test_masks_output=test_masks_output)
     for i in range(len(val_images)):
         visual_test.visualize(val_images[i], val_masks[i], test_masks_output[i])
     
