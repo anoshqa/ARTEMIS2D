@@ -1,3 +1,4 @@
+#an improvised version of predict which predicts on completely unseen images :) and saves the masks
 import torch
 import tifffile
 import os
