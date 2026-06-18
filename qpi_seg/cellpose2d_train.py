@@ -80,7 +80,8 @@ if __name__ == "__main__":
                                                                 model_name=model_name, 
                                                                 normalize = True, 
                                                                 save_path = save_path, save_every = 5,
-                                                                save_each = True
+                                                                save_each = True,
+                                                                
                                                                 )
     
     # %%

@@ -36,7 +36,7 @@ cpmodel_baseline_50epochs = models.CellposeModel(gpu=True,
 
 test_masks_output, flows, styles = cpmodel_baseline_50epochs.eval(val_image_resized, batch_size=4, normalize = True,niter=2000,flow_threshold=0)
 
-
+#TODO: I have to change scalebars
 test_masks_resized=[resize(image, (836,836),preserve_range=True,order=0) for image in test_masks_output]
 
 out_file_name_masks=[os.path.join(output_mask_folder, file) for file in out_file_name_stems]
