@@ -32,17 +32,18 @@ if __name__ == "__main__":
     learning_rate = 1e-5
     weight_decay = 0.1
     batch_size = 1
-    model_name = "cpmodel_baseline_50epochs"
+    model_name = "cpmodel_test_50epochs"
     # Data Paths
     image_folder = r'/mnt/efs/dl_jrc/student_data/S-DC/MIP_padded_final'
     mask_folder = r'/mnt/efs/dl_jrc/student_data/S-DC/Binary_masks/Binary_masks_'
-    save_path = Path("/mnt/efs/dl_jrc/student_data/S-DC/model")
+    save_path = Path("/mnt/efs/dl_jrc/student_data/S-DC/model_cp_2")
     train_files_percentage = 0.8
     image_filenames=sorted(os.listdir(image_folder))
     mask_filenames=sorted(os.listdir(mask_folder))
     npimage_files=np.array(image_filenames)
     npmask_files=np.array(mask_filenames)
     model = models.CellposeModel(gpu=True)
+    np.random.seed(42)
     shuffled_indices = np.random.permutation(len(npimage_files))
     image_files = npimage_files[shuffled_indices] # YOUR CODE HERE -> Hint: first transform to np.array
     mask_files = npmask_files[shuffled_indices]
@@ -79,6 +80,7 @@ if __name__ == "__main__":
                                                                 nimg_per_epoch=16, # can change this
                                                                 model_name=model_name, 
                                                                 normalize = True, 
+                                                                min_train_masks=1,
                                                                 save_path = save_path, save_every = 5,
                                                                 save_each = True,
                                                                 

@@ -66,7 +66,7 @@ def train_model(
             'optimizer_state_dict': optimizer.state_dict(),
             'loss': loss,
             }
-            torch.save(checkpoint, f'/home/S-DC/ARTEMIS2D/checkpoints_unet1/checkpoint_epoch_{epoch}.pt')   
+            torch.save(checkpoint, f'/home/S-DC/ARTEMIS2D/checkpoints_unet2/checkpoint_epoch_{epoch}.pt')   
 
         # log to tensorboard
         if tb_logger is not None:

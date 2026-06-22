@@ -33,7 +33,7 @@ npmask_files=np.array(mask_filenames)
 
 assert filetest.filetest(image_filenames,mask_filenames)
 
-
+np.random.seed(42)
 shuffled_indices = np.random.permutation(len(npimage_files)) #TODO: add random seed
 image_files = npimage_files[shuffled_indices] # YOUR CODE HERE -> Hint: first transform to np.array
 mask_files = npmask_files[shuffled_indices]
@@ -63,7 +63,7 @@ trainQPIdataset=qpi_seg.dataset.MIPDataset(image_folder,mask_folder,train_image_
 
 #validation i
 #TODO: do centercrop in validation
-validationQPIdataset=qpi_seg.dataset.MIPDataset(image_folder,mask_folder,val_image_files, val_mask_files,transform=transforms_v2.Resize((832,832),interpolation=transforms_v2.InterpolationMode.NEAREST),norm_setting="Dataset_min_max",norm_mean=None, norm_std=None,norm_min=13300,norm_max=14100)
+validationQPIdataset=qpi_seg.dataset.MIPDataset(image_folder,mask_folder,val_image_files, val_mask_files,transform=transforms_v2.CenterCrop((832,832),interpolation=transforms_v2.InterpolationMode.NEAREST),norm_setting="Dataset_min_max",norm_mean=None, norm_std=None,norm_min=13300,norm_max=14100)
 
 train_loader=DataLoader(trainQPIdataset, batch_size=4, shuffle=True)
 val_loader=DataLoader(validationQPIdataset, batch_size=4,shuffle=True)
