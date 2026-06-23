@@ -7,9 +7,9 @@ from models.unet import UNet
 import torch.nn as nn
 import matplotlib.pyplot as plt
 import numpy as np
-import qpi_seg.visualize as visual_test
 import qpi_seg.plot_grids as pg
 import qpi_seg.split_mask_5_channels as split
+import qpi_seg.visualize_unseen_unmasked as visualize
 
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 assert torch.cuda.is_available()
@@ -21,7 +21,7 @@ model.load_state_dict(model_save['model_state_dict'])
 model=model.to(device)
 
 #put your unseen images here
-test_images_folder=r'/mnt/efs/dl_jrc/student_data/S-DC/MIP_stitched'
+test_images_folder=r'/mnt/efs/dl_jrc/student_data/S-DC/Test_Victor/Test_victor'
 
 #put folder where masks will be saved
 unet_masks_output_folder=r'/mnt/efs/dl_jrc/student_data/S-DC/Mask_stitched_output_unet'
@@ -45,7 +45,7 @@ model.eval()
 clustermaps=[]
 
 
-for i in range(len(test_images)):
+for i in range(1):
     torch_test_image = from_np(test_images[i])
     torch_test_image=torch_test_image.float()
     img_norm= (torch_test_image - norm_min) / (norm_max - norm_min)
@@ -70,8 +70,8 @@ for i in range(len(test_images)):
     
 
     #pad clustermap with 4 pixels to have (836,836) original size if input size is x you need to pad with (x - 832)/2
-    padded_clustermap=np.pad(clustermap,((2,2),(2,2)),'constant',constant_values=(0,0))
-    clustermaps.append(padded_clustermap)
+    #padded_clustermap=np.pad(clustermap,((2,2),(2,2)),'constant',constant_values=(0,0))
+    clustermaps.append(clustermap)
 
 for i in range(len(out_file_name_masks)):
     tifffile.imwrite(
@@ -80,9 +80,9 @@ for i in range(len(out_file_name_masks)):
     )
 
 #plot grid is a function that outputs 10 images (5 x 2 pattern)
-pg.plot_grids(test_images[0:5],clustermaps[0:5] )
+#pg.plot_grids(test_images[0:5],clustermaps[0:5] )
 
-
+visualize.visualize(img_norm, clustermap)
 
 #the targets here are to export a merged mask of 5 channels
 
