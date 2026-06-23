@@ -1,15 +1,11 @@
 import matplotlib.pyplot as plt
-def visualize(im1,im2,im3):
+def visualize(im1,im3):
     plt.figure(figsize=(10, 10))
     plt.subplot(131)
     plt.imshow(im1) 
     plt.title("Input image 1",color="white")
     plt.axis('off')
     plt.subplot(132)
-    plt.imshow(im2)  
-    plt.title("Manual mask",color="white")
-    plt.axis('off')
-    plt.subplot(133)
     plt.imshow(im3)
     plt.title("UNet predicted mask",color="white")
     plt.tight_layout()

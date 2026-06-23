@@ -24,21 +24,21 @@ model=model.to(device)
 test_images_folder=r'/mnt/efs/dl_jrc/student_data/S-DC/Test_Victor/Test_victor'
 
 #put folder where masks will be saved
-unet_masks_output_folder=r'/mnt/efs/dl_jrc/student_data/S-DC/Mask_stitched_output_unet'
+unet_masks_output_folder=r'/mnt/efs/dl_jrc/student_data/S-DC/Mask_stitched_output_unet_victor'
 
 
 test_files= os.listdir(test_images_folder)
 test_images = [tifffile.imread(os.path.join(test_images_folder,file)) for file in test_files]
 
 
-out_file_name_stems=[os.path.splitext(file)[0]+'_unet_masks.tiff'for file in test_files ]
+out_file_name_stems=[os.path.splitext(file)[0][:30]+'_unet_masks.tiff'for file in test_files ]
 
 out_file_name_masks=[os.path.join(unet_masks_output_folder, file) for file in out_file_name_stems]
 
 from_np=transforms_v2.Lambda(lambda x: torch.from_numpy(x))
 transform = transforms_v2.CenterCrop((832,832))
 
-
+#for victor's dataset may have to play with this
 norm_min=13300
 norm_max=14100
 model.eval()
@@ -82,7 +82,7 @@ for i in range(len(out_file_name_masks)):
 #plot grid is a function that outputs 10 images (5 x 2 pattern)
 #pg.plot_grids(test_images[0:5],clustermaps[0:5] )
 
-visualize.visualize(img_norm, clustermap)
+visualize.visualize(img_norm.squeeze(dim=0).cpu(), clustermap)
 
 #the targets here are to export a merged mask of 5 channels
 
