@@ -23,7 +23,7 @@ val_image_files=os.listdir(image_folder)
 val_images=[tifffile.imread(os.path.join(image_folder, file)) for file in val_image_files]
 #save width and height of val_images[0]
 w=val_images[0].shape[0]
-h=val_images[1].shape[1]
+h=val_images[0].shape[1]
 
 out_file_name_stems=[os.path.splitext(file)[0][:30]+'_cp_masks.tiff'for file in val_image_files]
 
