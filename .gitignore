@@ -11,6 +11,7 @@ __pycache__/
 .vscode
 runs/*
 checkpoints_unet1/*
+checkpoints_unet2/*
 
 # Distribution / packaging
 .Python
