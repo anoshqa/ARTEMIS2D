@@ -32,19 +32,26 @@ if __name__ == "__main__":
     learning_rate = 1e-5
     weight_decay = 0.1
     batch_size = 1
-    model_name = "cpmodel_test_50epochs"
+    model_name = "cpmodel_test_all_images_50epochs"
     # Data Paths
     image_folder = r'/mnt/efs/dl_jrc/student_data/S-DC/MIP_padded_final'
     mask_folder = r'/mnt/efs/dl_jrc/student_data/S-DC/Binary_masks/Binary_masks_'
+    #path for saving model
     save_path = Path("/mnt/efs/dl_jrc/student_data/S-DC/model_cp_2")
     train_files_percentage = 0.8
     image_filenames=sorted(os.listdir(image_folder))
     mask_filenames=sorted(os.listdir(mask_folder))
     npimage_files=np.array(image_filenames)
     npmask_files=np.array(mask_filenames)
+    
+    #initial non fine-tuned model
     model = models.CellposeModel(gpu=True)
     np.random.seed(42)
+    
+    #
     shuffled_indices = np.random.permutation(len(npimage_files))
+    
+    
     image_files = npimage_files[shuffled_indices] # YOUR CODE HERE -> Hint: first transform to np.array
     mask_files = npmask_files[shuffled_indices]
     tot_num_image_files = len(npimage_files)
@@ -55,19 +62,19 @@ if __name__ == "__main__":
     train_mask_files = mask_files[:num_train_mask_files ] # YOUR CODE HERE
     val_image_files = image_files[num_train_image_files:] # YOUR CODE HERE
     val_mask_files = mask_files[num_train_mask_files:] # YOUR CODE HERE
-    transform= transforms_v2.Resize((128,128),interpolation=transforms_v2.InterpolationMode.NEAREST)
     
     train_images = [tifffile.imread(os.path.join(image_folder, file)) for file in train_image_files]
     train_masks=[tifffile.imread(os.path.join(mask_folder, file)) for file in train_mask_files]
     val_images=[tifffile.imread(os.path.join(image_folder, file)) for file in val_image_files]
     val_masks=[tifffile.imread(os.path.join(mask_folder, file))for file in val_mask_files]
     
+    #resizing
     train_image_resized=[resize(image, (418,418), anti_aliasing=True) for image in train_images]
     train_masks_resized=[resize(image, (418,418), anti_aliasing=True) for image in train_masks]
     val_image_resized=[resize(image, (418,418), anti_aliasing=True) for image in val_images]
     val_masks_resized=[resize(image, (418,418), anti_aliasing=True) for image in val_masks]
     io.logger_setup()
-
+    #read
     first_model_path, train_losses, test_losses = train.train_seg(model.net,
                                                                 train_data=train_image_resized,
                                                                 train_labels=train_masks_resized,
@@ -96,7 +103,7 @@ if __name__ == "__main__":
 
     timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
     #np.savez(save_path/f"test_results_{timestamp}.npz", ap=ap, tp=tp, fp=fp, fn=fn, test_masks=val_masks, test_masks_output=test_masks_output)
-    for i in range(len(val_images)):
-        visual_test.visualize(val_images[i], val_masks[i], test_masks_output[i])
+    #for i in range(len(val_images)):
+    #    visual_test.visualize(val_images[i], val_masks[i], test_masks_output[i])
     
     graph_losses(train_losses, test_losses)

@@ -10,11 +10,12 @@ import torchvision.transforms.v2 as transforms_v2
 from skimage.transform import resize
 import qpi_seg.visualize_unseen_unmasked as visualize
 
-first_model_path=r"/mnt/efs/dl_jrc/student_data/S-DC/model/models/cpmodel_baseline_50epochs"
+first_model_path=r"/mnt/efs/dl_jrc/student_data/S-DC/model/models/cpmodel_test_all_images_50epochs"
 
 #image_folder = r'/mnt/efs/dl_jrc/student_data/S-DC/MIP_unseen_padded'
-image_folder = r'/mnt/efs/dl_jrc/student_data/S-DC/Test_Victor/Test_victor'
-output_mask_folder = r'/mnt/efs/dl_jrc/student_data/S-DC/Mask_stitched_output_unet_victor'
+image_folder = r'/mnt/efs/dl_jrc/student_data/S-DC/Test_Swati/Save_mask_test'
+
+output_mask_folder = r'/mnt/efs/dl_jrc/student_data/S-DC/Unet_output_swati'
 
 model = models.CellposeModel(gpu=True)
 val_image_files=os.listdir(image_folder)
@@ -33,7 +34,7 @@ val_image_resized=[resize(image, (418,418), anti_aliasing=True,preserve_range=Tr
 cpmodel_baseline_50epochs = models.CellposeModel(gpu=True,
                                 pretrained_model=first_model_path)
 
-test_masks_output, flows, styles = cpmodel_baseline_50epochs.eval(val_image_resized, batch_size=4, normalize = True,niter=2000,flow_threshold=0)
+test_masks_output, flows, styles = cpmodel_baseline_50epochs.eval(val_image_resized, batch_size=4, normalize = True,niter=3000,flow_threshold=1)
 
 #TODO: I have to change shape
 #add a function to resize to the original shape of the image
