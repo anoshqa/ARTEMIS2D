@@ -12,12 +12,12 @@ import torchvision.transforms.v2 as transforms_v2
 from skimage.transform import resize
 import qpi_seg.visualize_unseen_unmasked as visualize
 
-first_model_path=r"/mnt/efs/dl_jrc/student_data/S-DC/model/models/cpmodel_test_all_images_50epochs"
+first_model_path=r"C:\Users\anous\OneDrive - Johns Hopkins\2026_DL_Janelia_course\Cellpose_model_1\cpmodel_test_all_images_50epochs"
 
 #image_folder = r'/mnt/efs/dl_jrc/student_data/S-DC/MIP_unseen_padded'
-image_folder = r'/mnt/efs/dl_jrc/student_data/S-DC/Test_Swati/Save_mask_test'
+image_folder = r'C:\Users\anous\Downloads\Test_victor'
 
-output_mask_folder = r'/mnt/efs/dl_jrc/student_data/S-DC/Unet_output_swati'
+output_mask_folder = r'C:\Users\anous\Downloads\Test_victor\Masks'
 
 model = models.CellposeModel(gpu=True)
 val_image_files=os.listdir(image_folder)
