@@ -1,4 +1,4 @@
-#an improvised version of predict which predicts on completely unseen images :) and saves the masks
+##UNET TESTING SCRIPT- export a merged mask of 5 channels on completely unseen images :) 
 import torch
 import tifffile
 import os
@@ -16,15 +16,15 @@ assert torch.cuda.is_available()
 model=UNet(depth=6,in_channels=1,out_channels=5, num_fmaps=32,final_activation=nn.Softmax()).to(device)
 
 #change the model path
-model_save=torch.load('/home/S-DC/ARTEMIS2D/checkpoints_unet2/checkpoint_epoch_190.pt')
+model_save=torch.load('')
 model.load_state_dict(model_save['model_state_dict'])
 model=model.to(device)
 
 #put your unseen images here
-test_images_folder=r'/mnt/efs/dl_jrc/student_data/S-DC/Test_Swati/Save_mask_test'
+test_images_folder=r''
 
 #put folder where masks will be saved
-unet_masks_output_folder=r'/mnt/efs/dl_jrc/student_data/S-DC/Unet_output_swati'
+unet_masks_output_folder=r''
 
 
 test_files= os.listdir(test_images_folder)
@@ -51,8 +51,9 @@ for i in range(1):
     img_norm= (torch_test_image - norm_min) / (norm_max - norm_min)
     img_norm=img_norm.unsqueeze(dim=0).to(device)
     img_norm2=img_norm.unsqueeze(dim=0).to(device)
+    #TODO: for future extensions - save size of the image
+    
     img_norm2=transform(img_norm2)
-   
     torch_prediction2=model(img_norm2) #prediction
     clustermap=np.zeros((832,832))
     torch_prediction=torch_prediction2.reshape(5,832,832).detach().cpu() #reshape to 5 channels and detach and cpu
@@ -84,6 +85,6 @@ for i in range(1):
 
 visualize.visualize(img_norm.squeeze(dim=0).cpu(), clustermap)
 
-#the targets here are to export a merged mask of 5 channels
+
 
 

@@ -1,3 +1,5 @@
+##CELLPOSE TESTING SCRIPT- export cell instance masks on completely unseen images :) 
+
 from cellpose import io
 from cellpose import models, core, io, plot, train, metrics
 import torch
