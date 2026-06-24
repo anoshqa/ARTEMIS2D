@@ -12,7 +12,11 @@ Instructions to start it working on PC (use VS studio terminal)
 2. ls artemis2d (to see files inside the folder)
 3. cd artemis2d (goes to artemis2d folder)
 once you are on the folder 
-4. conda env create -f environment.yml
+4. conda create -n artemis2d (suggested name of new environment)
+5. pip3 install torch torchvision (for downloading torch on Windows without GPU)
+6. pip install celllpose
+
+
 
 You will also need two folders access
 1. cellpose pre-trained model (trained on 700 breast cancer MIPs so far)

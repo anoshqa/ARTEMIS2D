@@ -17,9 +17,8 @@ first_model_path=r"C:\Users\anous\OneDrive - Johns Hopkins\2026_DL_Janelia_cours
 #image_folder = r'/mnt/efs/dl_jrc/student_data/S-DC/MIP_unseen_padded'
 image_folder = r'C:\Users\anous\Downloads\Test_victor'
 
-output_mask_folder = r'C:\Users\anous\Downloads\Test_victor\Masks'
+output_mask_folder = r'C:\Users\anous\Downloads\Test_victor_masks'
 
-model = models.CellposeModel(gpu=True)
 val_image_files=os.listdir(image_folder)
 
 
@@ -33,10 +32,10 @@ out_file_name_stems=[os.path.splitext(file)[0][:30]+'_cp_masks.tiff'for file in 
 
 val_image_resized=[resize(image, (418,418), anti_aliasing=True,preserve_range=True) for image in val_images]
 
-cpmodel_baseline_50epochs = models.CellposeModel(gpu=True,
+cpmodel_baseline_50epochs = models.CellposeModel(gpu=False,
                                 pretrained_model=first_model_path)
 
-test_masks_output, flows, styles = cpmodel_baseline_50epochs.eval(val_image_resized, batch_size=4, normalize = True,niter=3000,flow_threshold=1)
+test_masks_output, flows, styles = cpmodel_baseline_50epochs.eval(val_image_resized, batch_size=4, normalize = True,niter=500,flow_threshold=0.4)
 
 #TODO: I have to change shape
 #add a function to resize to the original shape of the image
