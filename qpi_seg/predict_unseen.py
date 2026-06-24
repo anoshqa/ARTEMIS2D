@@ -12,19 +12,19 @@ import qpi_seg.split_mask_5_channels as split
 import qpi_seg.visualize_unseen_unmasked as visualize
 
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
-assert torch.cuda.is_available()
+#assert torch.cuda.is_available()
 model=UNet(depth=6,in_channels=1,out_channels=5, num_fmaps=32,final_activation=nn.Softmax()).to(device)
 
 #change the model path
-model_save=torch.load('')
+model_save=torch.load(r'C:\Users\anous\OneDrive - Johns Hopkins\2026_DL_Janelia_course\UNet_model_1\checkpoint_epoch_190.pt',map_location=torch.device('cpu'))
 model.load_state_dict(model_save['model_state_dict'])
 model=model.to(device)
 
 #put your unseen images here
-test_images_folder=r''
+test_images_folder=r'C:\Users\anous\Downloads\Test_anoushka'
 
 #put folder where masks will be saved
-unet_masks_output_folder=r''
+unet_masks_output_folder=r'C:\Users\anous\Downloads\Test_anoushka_masks'
 
 
 test_files= os.listdir(test_images_folder)
@@ -63,7 +63,7 @@ for i in range(1):
     ch4_prediction=torch_prediction[3,:,:]
     ch5_prediction=torch_prediction[4,:,:]
     clustermap[ch1_prediction>=0.5]=0
-    clustermap[ch2_prediction<=1]=1
+    clustermap[ch2_prediction>=0.5]=1
     clustermap[ch3_prediction>=0.5]=2
     clustermap[ch4_prediction>=0.5]=3
     clustermap[ch5_prediction>=0.5]=4

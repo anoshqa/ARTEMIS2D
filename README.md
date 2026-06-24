@@ -14,7 +14,7 @@ Instructions to start it working on PC (use VS studio terminal)
 once you are on the folder 
 4. conda create -n artemis2d (suggested name of new environment)
 5. pip3 install torch torchvision (for downloading torch on Windows without GPU)
-6. pip install celllpose
+6. pip install cellpose
 
 
 

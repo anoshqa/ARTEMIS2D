@@ -29,19 +29,19 @@ h=val_images[0].shape[1]
 
 out_file_name_stems=[os.path.splitext(file)[0][:30]+'_cp_masks.tiff'for file in val_image_files]
 
-
-val_image_resized=[resize(image, (418,418), anti_aliasing=True,preserve_range=True) for image in val_images]
+#trying rescale to
+val_image_resized=[resize(image, (200,200), anti_aliasing=True,preserve_range=True) for image in val_images]
 
 cpmodel_baseline_50epochs = models.CellposeModel(gpu=False,
                                 pretrained_model=first_model_path)
-
-test_masks_output, flows, styles = cpmodel_baseline_50epochs.eval(val_image_resized, batch_size=4, normalize = True,niter=500,flow_threshold=0.4)
+#niter needs to be higher 
+test_masks_output, flows, styles = cpmodel_baseline_50epochs.eval(val_image_resized, batch_size=4, normalize = True,flow_threshold=0)
 
 #TODO: I have to change shape
 #add a function to resize to the original shape of the image
 
-
-test_masks_resized=[resize(image, (w,h),preserve_range=True,order=0) for image in test_masks_output]
+#check resize preserve_range, interpolation order options
+test_masks_resized=[resize(image, (w,h),anti_aliasing=True) for image in test_masks_output]
 
 out_file_name_masks=[os.path.join(output_mask_folder, file) for file in out_file_name_stems]
 
