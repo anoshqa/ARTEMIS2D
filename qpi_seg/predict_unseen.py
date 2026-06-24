@@ -16,7 +16,14 @@ device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cp
 model=UNet(depth=6,in_channels=1,out_channels=5, num_fmaps=32,final_activation=nn.Softmax()).to(device)
 
 #change the model path
-model_save=torch.load(r'C:\Users\anous\OneDrive - Johns Hopkins\2026_DL_Janelia_course\UNet_model_1\checkpoint_epoch_190.pt',map_location=torch.device('cpu'))
+model_path=r'C:\Users\anous\OneDrive - Johns Hopkins\2026_DL_Janelia_course\UNet_model_1\checkpoint_epoch_190.pt'
+#add map_location if using on CPU
+model_save=torch.load(model_path,map_location=torch.device('cpu'))
+
+#if using GPU uncomment the following two lines
+#assert torch.cuda.is_available()
+#model_save=torch.load(model_path)
+
 model.load_state_dict(model_save['model_state_dict'])
 model=model.to(device)
 

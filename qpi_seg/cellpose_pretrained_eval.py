@@ -29,18 +29,19 @@ h=val_images[0].shape[1]
 
 out_file_name_stems=[os.path.splitext(file)[0][:30]+'_cp_masks.tiff'for file in val_image_files]
 
-#trying rescale to
+#smaller sizes give faster output - training was done with (418,418)
 val_image_resized=[resize(image, (200,200), anti_aliasing=True,preserve_range=True) for image in val_images]
 
+#keep GPU=true
 cpmodel_baseline_50epochs = models.CellposeModel(gpu=False,
                                 pretrained_model=first_model_path)
-#niter needs to be higher 
+#niter needs to be higher if your cells are bigger
 test_masks_output, flows, styles = cpmodel_baseline_50epochs.eval(val_image_resized, batch_size=4, normalize = True,flow_threshold=0)
 
 #TODO: I have to change shape
 #add a function to resize to the original shape of the image
 
-#check resize preserve_range, interpolation order options
+#check resize function's preserve_range, interpolation order options
 test_masks_resized=[resize(image, (w,h),anti_aliasing=True) for image in test_masks_output]
 
 out_file_name_masks=[os.path.join(output_mask_folder, file) for file in out_file_name_stems]
