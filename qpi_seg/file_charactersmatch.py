@@ -9,4 +9,5 @@ def filetest(mipfilenames, mask_filenames):
     if len(matched)==len(mipfilenames):
         return True
     else:
-        return False
+        return unmatched
+    
