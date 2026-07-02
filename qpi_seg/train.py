@@ -23,9 +23,9 @@ device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cp
 assert torch.cuda.is_available()
 #call Dataset
 
-image_folder=r'/mnt/efs/dl_jrc/student_data/S-DC/MIP_padded_final'
-mask_folder=r'/mnt/efs/dl_jrc/student_data/S-DC/Masks_padded_final'
-train_files_percentage = 0.80
+image_folder=r'D:\TRAINING_DATA_FINAL\MIP_ALL'
+mask_folder=r'D:\TRAINING_DATA_FINAL\MASK_ALL'
+train_files_percentage = 1.00
 image_filenames=sorted(os.listdir(image_folder))
 mask_filenames=sorted(os.listdir(mask_folder))
 npimage_files=np.array(image_filenames)
@@ -52,20 +52,20 @@ weight_for_loss_balance= CW.calculate_weights(mask_folder,train_mask_files)
 
 #print(train_mean,train_std)
 transform = transforms_v2.Compose([
-    transforms_v2.CenterCrop((832,832)),
+    #transforms_v2.CenterCrop((832,832)),
     transforms_v2.RandomRotation([-90,90],fill=0),
     transforms_v2.RandomHorizontalFlip(p=0.5),
     transforms_v2.RandomVerticalFlip(p=0.5),
-    transforms_v2.RandomResizedCrop((832,832),antialias=True,scale=(0.75,1.25),interpolation=transforms_v2.InterpolationMode.NEAREST),
+    transforms_v2.RandomResizedCrop((1344,1344),antialias=True,scale=(0.75,1.25),interpolation=transforms_v2.InterpolationMode.NEAREST),
 ])
 
 trainQPIdataset=qpi_seg.dataset.MIPDataset(image_folder,mask_folder,train_image_files, train_mask_files,transform=transform,norm_setting="Dataset_min_max",norm_mean=None, norm_std=None,norm_min=13300,norm_max=14100) #original image is 836,836
 
 
-validationQPIdataset=qpi_seg.dataset.MIPDataset(image_folder,mask_folder,val_image_files, val_mask_files,transform=transforms_v2.CenterCrop((832,832)),norm_setting="Dataset_min_max",norm_mean=None, norm_std=None,norm_min=13300,norm_max=14100)
+#validationQPIdataset=qpi_seg.dataset.MIPDataset(image_folder,mask_folder,val_image_files, val_mask_files,transform=transforms_v2.CenterCrop((832,832)),norm_setting="Dataset_min_max",norm_mean=None, norm_std=None,norm_min=13300,norm_max=14100)
 
 train_loader=DataLoader(trainQPIdataset, batch_size=4, shuffle=True)
-val_loader=DataLoader(validationQPIdataset, batch_size=4,shuffle=True)
+#val_loader=DataLoader(validationQPIdataset, batch_size=4,shuffle=True)
 batch_image,batch_mask=next(iter(train_loader))
 #print(batch_image.shape)
 #print(batch_mask.shape)
@@ -93,7 +93,7 @@ class multiclassDiceCoefficient(nn.Module):
 dice_list=multiclassDiceCoefficient()
 for epoch in range(200):
     train_model.train_model(myUnet, train_loader, optimizer, loss, epoch, device=device,tb_logger=logger)
-    step= epoch * len(train_loader) 
-    validate.validate(myUnet,val_loader,loss,dice_list,step=step,device=device,tb_logger=logger)
+    #step= epoch * len(train_loader) 
+    #validate.validate(myUnet,val_loader,loss,dice_list,step=step,device=device,tb_logger=logger)
 
 
