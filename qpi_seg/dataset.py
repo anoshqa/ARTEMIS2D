@@ -3,7 +3,6 @@ import torch
 from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
 import qpi_seg.file_charactersmatch as filetest
-import visualize
 import tifffile
 from tqdm import tqdm
 import torchvision.transforms.v2 as transforms_v2

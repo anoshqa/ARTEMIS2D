@@ -59,14 +59,14 @@ def train_model(
         #        )
         #    )
         
-        if epoch % 10 ==0:
+        if epoch % 30 ==0:
             checkpoint = {
             'epoch': epoch,
             'model_state_dict': model.state_dict(),
             'optimizer_state_dict': optimizer.state_dict(),
             'loss': loss,
             }
-            torch.save(checkpoint, f'/home/S-DC/ARTEMIS2D/checkpoints_unet2/checkpoint_epoch_{epoch}.pt')   
+            torch.save(checkpoint, f'D:/TRAINING_DATA_FINAL/Model_checkpoints/checkpoint_epoch_{epoch}.pt')   
 
         # log to tensorboard
         if tb_logger is not None:

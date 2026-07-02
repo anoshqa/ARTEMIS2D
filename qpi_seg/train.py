@@ -1,4 +1,3 @@
-import visualize
 import qpi_seg.dataset
 import torch
 from torch.utils.data import DataLoader
