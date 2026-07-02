@@ -2,8 +2,7 @@ import os
 import torch
 from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
-import file_charactersmatch as filetest
-import shape_match as shape_match
+import qpi_seg.file_charactersmatch as filetest
 import visualize
 import tifffile
 from tqdm import tqdm

@@ -34,17 +34,17 @@ npmask_files=np.array(mask_filenames)
 assert filetest.filetest(image_filenames,mask_filenames)
 
 np.random.seed(42)
-shuffled_indices = np.random.permutation(len(npimage_files)) #TODO: add random seed
-image_files = npimage_files[shuffled_indices] # YOUR CODE HERE -> Hint: first transform to np.array
+shuffled_indices = np.random.permutation(len(npimage_files)) 
+image_files = npimage_files[shuffled_indices] # first transform to np.array
 mask_files = npmask_files[shuffled_indices]
 tot_num_image_files = len(npimage_files)
 tot_num_mask_files = len(npmask_files)
 num_train_image_files = int(train_files_percentage*tot_num_image_files) 
 num_train_mask_files = int(train_files_percentage*tot_num_mask_files)
-train_image_files = image_files[:num_train_image_files ] # YOUR CODE HERE
-train_mask_files = mask_files[:num_train_mask_files ] # YOUR CODE HERE
-val_image_files = image_files[num_train_image_files:] # YOUR CODE HERE
-val_mask_files = mask_files[num_train_mask_files:] # YOUR CODE HERE
+train_image_files = image_files[:num_train_image_files ] 
+train_mask_files = mask_files[:num_train_mask_files ] 
+val_image_files = image_files[num_train_image_files:] 
+val_mask_files = mask_files[num_train_mask_files:] 
 
 
 #train_mean, train_std= mean.mean_fn(image_folder,train_image_files)
@@ -58,11 +58,10 @@ transform = transforms_v2.Compose([
     transforms_v2.RandomVerticalFlip(p=0.5),
     transforms_v2.RandomResizedCrop((832,832),antialias=True,scale=(0.75,1.25),interpolation=transforms_v2.InterpolationMode.NEAREST),
 ])
-#channel_transform=
+
 trainQPIdataset=qpi_seg.dataset.MIPDataset(image_folder,mask_folder,train_image_files, train_mask_files,transform=transform,norm_setting="Dataset_min_max",norm_mean=None, norm_std=None,norm_min=13300,norm_max=14100) #original image is 836,836
 
-#validation i
-#TODO: do centercrop in validation
+
 validationQPIdataset=qpi_seg.dataset.MIPDataset(image_folder,mask_folder,val_image_files, val_mask_files,transform=transforms_v2.CenterCrop((832,832)),norm_setting="Dataset_min_max",norm_mean=None, norm_std=None,norm_min=13300,norm_max=14100)
 
 train_loader=DataLoader(trainQPIdataset, batch_size=4, shuffle=True)
@@ -90,12 +89,6 @@ class multiclassDiceCoefficient(nn.Module):
             denominator = (prediction[:,i,:,:]** 2).sum() + (target[:,i,:,:] ** 2).sum()
             dice_coeffs.append(numerator / denominator.clamp(min=self.eps))
         return dice_coeffs
-
-#class IoU_foreground(nn.Module):
-#    def __init__(self,eps=1e-6):
-#        super().__init__()
-#        self.eps=eps
-#    def forward(self,prediction,target):
         
 dice_list=multiclassDiceCoefficient()
 for epoch in range(200):
