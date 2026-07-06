@@ -17,9 +17,9 @@ print(f"Is CUDA available? {cuda_available}")
 first_model_path=r"D:\Cellpose_segmentation\cpmodel_test_all_images_50epochs.pt"
 
 #put image folder name
-image_folder = r"H:\Victor data\QPI\TIFF 20260611 Exp2 Res t2\2D"
+image_folder = r"D:\TRAINING_DATA_FINAL\TEST_MIP"
 #put output mask folder name
-output_mask_folder = r"H:\Victor data\QPI\TIFF 20260611 Exp2 Res t2\2D_mask_cp_1"
+output_mask_folder = r"D:\TRAINING_DATA_FINAL\OUTPUT_CP"
 #all val image files
 val_image_files=os.listdir(image_folder)
 
@@ -33,7 +33,9 @@ out_file_name_masks=[os.path.join(output_mask_folder, file) for file in out_file
 cpmodel_baseline_50epochs = models.CellposeModel(gpu=True,
                                 pretrained_model=first_model_path)
 test_masks_resized=[]
-for i in range(len(val_images)):
+
+num_images_to_test=1
+for i in range(num_images_to_test):
    
     w=val_images[i].shape[0]
     h=val_images[i].shape[1]
@@ -59,5 +61,5 @@ for i in range(len(val_images)):
 #test_masks=test_masks_output[0:5]
 #pg.plot_grids(val_image_resized,test_masks)
 
-#visualize.visualize(val_images[0], test_masks_resized[0])
+visualize.visualize(val_images[0], test_masks_resized[0])
 #if 5 masks are not there use

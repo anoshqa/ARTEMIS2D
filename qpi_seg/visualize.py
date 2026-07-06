@@ -14,4 +14,5 @@ def visualize(im1,im2,im3):
     plt.title("UNet predicted mask",color="white")
     plt.tight_layout()
     plt.axis('off')
+    plt.colorbar()
     plt.savefig('demoimage.png',dpi=300,transparent=True)
