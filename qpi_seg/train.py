@@ -51,7 +51,7 @@ weight_for_loss_balance= CW.calculate_weights(mask_folder,train_mask_files)
 
 #print(train_mean,train_std)
 transform = transforms_v2.Compose([
-    #transforms_v2.CenterCrop((832,832)),
+    #transforms_v2.Resize((832,832),interpolation=transforms_v2.InterpolationMode.NEAREST),
     transforms_v2.RandomRotation([-90,90],fill=0),
     transforms_v2.RandomHorizontalFlip(p=0.5),
     transforms_v2.RandomVerticalFlip(p=0.5),
@@ -63,7 +63,7 @@ trainQPIdataset=qpi_seg.dataset.MIPDataset(image_folder,mask_folder,train_image_
 
 #validationQPIdataset=qpi_seg.dataset.MIPDataset(image_folder,mask_folder,val_image_files, val_mask_files,transform=transforms_v2.CenterCrop((832,832)),norm_setting="Dataset_min_max",norm_mean=None, norm_std=None,norm_min=13300,norm_max=14100)
 
-train_loader=DataLoader(trainQPIdataset, batch_size=4, shuffle=True)
+train_loader=DataLoader(trainQPIdataset, batch_size=8, shuffle=True)
 #val_loader=DataLoader(validationQPIdataset, batch_size=4,shuffle=True)
 batch_image,batch_mask=next(iter(train_loader))
 #print(batch_image.shape)
@@ -74,7 +74,7 @@ batch_image,batch_mask=next(iter(train_loader))
 myUnet = UNet(depth=6,in_channels=1,out_channels=5, num_fmaps=32,final_activation=nn.Softmax()).to(device)
 loss=nn.CrossEntropyLoss(weight = weight_for_loss_balance.to(device), label_smoothing=0.0)
 optimizer=torch.optim.AdamW(myUnet.parameters(),lr=1e-4)
-logger = SummaryWriter("runs/Batch_norm")
+logger = SummaryWriter("runs/Bigsize")
 
 class multiclassDiceCoefficient(nn.Module):
     def __init__(self, eps=1e-6):
@@ -90,7 +90,7 @@ class multiclassDiceCoefficient(nn.Module):
         return dice_coeffs
         
 dice_list=multiclassDiceCoefficient()
-for epoch in range(200):
+for epoch in range(100):
     train_model.train_model(myUnet, train_loader, optimizer, loss, epoch, device=device,tb_logger=logger)
     #step= epoch * len(train_loader) 
     #validate.validate(myUnet,val_loader,loss,dice_list,step=step,device=device,tb_logger=logger)

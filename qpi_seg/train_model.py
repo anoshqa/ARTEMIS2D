@@ -45,7 +45,7 @@ def train_model(
         loss.backward()
         optimizer.step()
         
-        if batch_id % 20 == 0 or batch_id == len(loader) - 1:
+        if batch_id % 30 == 0 or batch_id == len(loader) - 1:
             print(f"Epoch: {epoch} - Batch: {batch_id}/{len(loader)} - Loss: {loss.item()}")
             tb_logger.add_scalar(tag="train_loss", scalar_value=loss, global_step=epoch * len(loader) + batch_id)
         #if batch_id % log_interval == 0:
@@ -59,14 +59,14 @@ def train_model(
         #        )
         #    )
         
-        if epoch % 30 ==0:
+        if epoch % 10 == 0 or epoch == 99:
             checkpoint = {
             'epoch': epoch,
             'model_state_dict': model.state_dict(),
             'optimizer_state_dict': optimizer.state_dict(),
             'loss': loss,
             }
-            torch.save(checkpoint, f'D:/TRAINING_DATA_FINAL/Model_checkpoints/checkpoint_epoch_{epoch}.pt')   
+            torch.save(checkpoint, f'D:/TRAINING_DATA_FINAL/Model_fullsize_checkpoints/checkpoint_epoch_{epoch}.pt')   
 
         # log to tensorboard
         if tb_logger is not None:
