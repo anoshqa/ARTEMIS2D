@@ -16,22 +16,26 @@ device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cp
 model=UNet(depth=6,in_channels=1,out_channels=5, num_fmaps=32,final_activation=nn.Softmax()).to(device)
 
 #change the model path
-model_path=r"C:\Users\BarmanLab\Downloads\checkpoint_epoch_190.pt"
+
+#for personal PC -
+model_path=r"C:\Users\anous\OneDrive - Johns Hopkins\2026_DL_Janelia_course\UNet_model_1\checkpoint_epoch_190.pt"
 #add map_location if using on CPU
-#model_save=torch.load(model_path,map_location=torch.device('cpu'))
+
+
+model_save=torch.load(model_path,map_location=torch.device('cpu'))
 
 #if using GPU uncomment the following two lines
-assert torch.cuda.is_available()
-model_save=torch.load(model_path)
+#assert torch.cuda.is_available()
+#model_save=torch.load(model_path)
 
 model.load_state_dict(model_save['model_state_dict'])
 model=model.to(device)
 
 #put your unseen images here
-test_images_folder=r'D:\TRAINING_DATA_FINAL\TEST_MIP'
+test_images_folder=r'C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\UNSEEN_MIP_1'
 
 #put folder where masks will be saved
-unet_masks_output_folder=r'D:\TRAINING_DATA_FINAL\TEST_MASK'
+unet_masks_output_folder=r'C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\UNSEEN_UNET_MASK'
 
 
 test_files= os.listdir(test_images_folder)
@@ -56,14 +60,14 @@ clustermaps=[]
 
 
 for i in range(0,1):
-    #w=test_images[i].shape[0]
-    #h=test_images[i].shape[1]
+    w=test_images[i].shape[0]
+    h=test_images[i].shape[1]
+    cropped_transform=transforms_v2.CenterCrop((w,h))
     torch_test_image = from_np(test_images[i])
     torch_test_image=torch_test_image.float()
     img_norm= (torch_test_image - norm_min) / (norm_max - norm_min)
     img_norm=img_norm.unsqueeze(dim=0).to(device)
     img_norm2=transform(img_norm.unsqueeze(dim=0).to(device))
-    #TODO: for future extensions - save size of the image
     torch_prediction=model(img_norm2)
     clustermap=np.zeros((im_size,im_size))
     torch_prediction=torch_prediction.reshape(5,im_size,im_size).detach().cpu()
@@ -83,8 +87,11 @@ for i in range(0,1):
     transformed_mip=transformed_mip.squeeze(dim=0).cpu()
     print(transformed_mip.shape)
     #print(clustermap.shape)
-    visualize.visualize(transformed_mip, clustermap)
-    #clustermaps.append(clustermap)
+    
+    cropped_clustermap=cropped_transform(clustermap)
+    print(cropped_clustermap.shape)
+    visualize.visualize(test_images[i], cropped_clustermap)
+    clustermaps.append(cropped_clustermap)
 
 #for i in range(len(out_file_name_masks)):
 #    tifffile.imwrite(
