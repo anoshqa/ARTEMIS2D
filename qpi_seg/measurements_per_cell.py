@@ -8,10 +8,9 @@ import skimage
 from skimage.measure import label, regionprops
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt 
-import qpi_seg.visualize_unseen_unmasked as visualize
+#import qpi_seg.visualize_unseen_unmasked as visualize
 #actually you put unseen image
-images_folder=r'C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\UNSEEN_MIP_1'
+images_folder=r'D:\TRAINING_DATA_FINAL\TEST_MIP'
 
 
 cellpose_mask_folder=r'C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\UNSEEN_MIP_1_CELL_MASK'
@@ -54,7 +53,6 @@ for i in range(len(cp_masks)):
         mask2[mask2>0]=1
         #per cell semantic mask = cp_mask after filter x unet_masks[i]
         combined_mask = mask2 * unet_masks[i]
-        visualize.visualize(mask2, combined_mask)
         combined_mask[mask2==1]=1
         out_file_name_stem=f"{out_file_name_stems[i]}_mask{submask_value}.tiff"
         print(out_file_name_stem)
