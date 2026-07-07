@@ -4,22 +4,19 @@ from cellpose import io
 from cellpose import models, core, io, plot, train, metrics
 import torch
 import numpy as np
-import matplotlib.pyplot as plt
-import qpi_seg.visualize as visual_test
 import os
 import tifffile
-import torchvision.transforms.v2 as transforms_v2
 from skimage.transform import resize
-import qpi_seg.visualize_unseen_unmasked as visualize
+import napari
 
 cuda_available = torch.cuda.is_available()
 print(f"Is CUDA available? {cuda_available}")
 first_model_path=r"D:\Cellpose_segmentation\cpmodel_test_all_images_50epochs.pt"
 
 #put image folder name
-image_folder = r"D:\TRAINING_DATA_FINAL\TEST_MIP"
+image_folder = r"F:\TRAINING_DATA_FINAL\Remaining_MIP_from_storage"
 #put output mask folder name
-output_mask_folder = r"D:\TRAINING_DATA_FINAL\OUTPUT_CP"
+output_mask_folder = r"F:\TRAINING_DATA_FINAL\Remaining_MIP_storage_cp_masks"
 #all val image files
 val_image_files=os.listdir(image_folder)
 
@@ -33,33 +30,54 @@ out_file_name_masks=[os.path.join(output_mask_folder, file) for file in out_file
 cpmodel_baseline_50epochs = models.CellposeModel(gpu=True,
                                 pretrained_model=first_model_path)
 test_masks_resized=[]
-
-num_images_to_test=1
-for i in range(num_images_to_test):
+resized_val_images=[]
+cropped_masks=[]
+w_list=[]
+h_list=[]
+out_file_name_masks_selected=[]
+for i in range(300,552):
    
     w=val_images[i].shape[0]
     h=val_images[i].shape[1]
-    print(w,h)
+    w_list.append(w)
+    h_list.append(h)
+    #print(w,h)
     image = val_images[i]
     #smaller sizes give faster output - training was done with (418,418)
     val_image_resized=resize(image, (418,418), anti_aliasing=True,preserve_range=True) 
+    resized_val_images.append(val_image_resized)
     #niter needs to be higher if your cells are bigger
-    test_masks_output, flows, styles = cpmodel_baseline_50epochs.eval(val_image_resized, batch_size=4, normalize = True,flow_threshold=0)
-
+    test_masks_output, flows, styles = cpmodel_baseline_50epochs.eval(val_image_resized, batch_size=4, normalize = True,flow_threshold=0.4)
+    cropped_masks.append(test_masks_output)
+    out_file_name_masks_selected.append(out_file_name_masks[i])
     #check resize function's preserve_range, interpolation order options
-    test_masks_resized.append(resize(test_masks_output, (w,h),order=0,               # 0 corresponds to nearest-neighbor
-    anti_aliasing=False))
+    #test_masks_resized.append(resize(test_masks_output, (w,h),order=0,               # 0 corresponds to nearest-neighbor
+    #anti_aliasing=False))
+    #tifffile.imwrite(
+    #    out_file_name_masks[i],
+    #    test_masks_resized[i]
+    #)
+val_image_stack = np.stack(resized_val_images, axis=0)
+mask_stack = np.stack(cropped_masks, axis=0)
+if __name__ == '__main__':
+
+
+    viewer = napari.Viewer()
+# create the viewer and add the coins image
+    viewer.add_image(val_image_stack, name='mip')
+# add the labels
+    viewer.add_labels(mask_stack, name='segmentation')
+    napari.run()
+for i in range(len(out_file_name_masks_selected)):
+   
+    w=w_list[i]
+    h=h_list[i]
+    edited_mask=mask_stack[i]
+    test_masks_resized.append(resize(edited_mask, (w,h),order=0,anti_aliasing=False))
     tifffile.imwrite(
-        out_file_name_masks[i],
+        out_file_name_masks_selected[i],
         test_masks_resized[i]
     )
 
-
-#for visualizing first five masks
-#import qpi_seg.plot_grids as pg
-#val_image_resized_5=val_image_resized[0:5]
-#test_masks=test_masks_output[0:5]
-#pg.plot_grids(val_image_resized,test_masks)
-
-visualize.visualize(val_images[0], test_masks_resized[0])
+#visualize.visualize(val_images[0], test_masks_resized[0])
 #if 5 masks are not there use

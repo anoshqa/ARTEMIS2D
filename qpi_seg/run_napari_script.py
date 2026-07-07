@@ -3,8 +3,11 @@ import os
 import tifffile
 import numpy as np
 
+
+#import resized val images
+
 image_folder = r"H:\Victor data\QPI\TIFF 20260611 Exp2 Res t2\2D"
-#put output mask folder name
+#import resized val images
 output_mask_folder = r"H:\Victor data\QPI\TIFF 20260611 Exp2 Res t2\2D_mask_cp_1"
 #all val image files
 
