@@ -48,7 +48,7 @@ out_file_name_masks=[os.path.join(unet_masks_output_folder, file) for file in ou
 
 from_np=transforms_v2.Lambda(lambda x: torch.from_numpy(x))
 
-im_size=2016
+im_size=2240
 transform = transforms_v2.CenterCrop((im_size,im_size))
 
 #for victor's dataset may have to play with this
@@ -59,9 +59,10 @@ model = model.to(device)
 clustermaps=[]
 
 
-for i in range(0,1):
+for i in range(len(test_files)):
     w=test_images[i].shape[0]
     h=test_images[i].shape[1]
+    print(w,h)
     cropped_transform=transforms_v2.CenterCrop((w,h))
     torch_test_image = from_np(test_images[i])
     torch_test_image=torch_test_image.float()
@@ -88,16 +89,16 @@ for i in range(0,1):
     print(transformed_mip.shape)
     #print(clustermap.shape)
     
-    cropped_clustermap=cropped_transform(clustermap)
+    cropped_clustermap=cropped_transform((from_np(clustermap)).unsqueeze(dim=0))
     print(cropped_clustermap.shape)
-    visualize.visualize(test_images[i], cropped_clustermap)
-    clustermaps.append(cropped_clustermap)
+    #visualize.visualize(test_images[i], cropped_clustermap.squeeze(dim=0))
+    clustermaps.append(cropped_clustermap.squeeze(dim=0))
 
-#for i in range(len(out_file_name_masks)):
-#    tifffile.imwrite(
-#        out_file_name_masks[i],
-#        clustermaps[i]
-#    )
+for i in range(len(out_file_name_masks)):
+    tifffile.imwrite(
+        out_file_name_masks[i],
+        clustermaps[i].detach().cpu().numpy()
+    )
 
 #plot grid is a function that outputs 10 images (5 x 2 pattern)
 #pg.plot_grids(test_images[0:5],clustermaps[0:5] )
