@@ -1,9 +1,9 @@
-Cellpose is used for instance segmentation to identify different cell instances in a QPI MIP image.
+About qpi_seg folder:
 
-UNET is used to segment cell, nucleus, nucleolus, lipid droplet and background (5 channels) from QPI image of sizes greater than (832, 832). 
+Cellpose is used for instance segmentation to identify different cell instances in a QPI MIP image. UNET is used to segment cell, nucleus, nucleolus, lipid droplet and background (5 channels) from QPI image
 
-
-Please put new image folder path in 'predict_unseen.py' script inside qpi_seg folder to test out masks from Unet. To test out masks from cellpose (afterfinetuning), use the 'cellpose_pretrained_eval.py', for original cellpose use 'cellpose_eval.py'.
+Predict scripts - 
+For inferring masks from Unet: 'predict_unseen.py'. For inference from cellpose (afterfinetuning): 'cellpose_pretrained_eval.py', for inference from original cellpose: 'cellpose_eval.py'.
 
 To use the predict_unseen.py file you would need the saved model that is https://livejohnshopkins-my.sharepoint.com/:u:/g/personal/agupt130_jh_edu/IQCuq4fhppjxRbd9RnAlhxV_ARqKCvYyAgTsh4ZhQGkvFV4?e=fHOBhD
 
@@ -17,9 +17,7 @@ once you are on the folder
 6. pip3 install torch torchvision (for downloading torch on Windows without GPU)
 7. pip install cellpose
 
-
-
-You will also need two folders access
+You will also need two saved models 
 1. cellpose pre-trained model (trained on 700 breast cancer MIPs so far)
 2. UNet 
 

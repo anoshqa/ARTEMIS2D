@@ -8,7 +8,6 @@ def visualize(im1,im3):
     plt.subplot(132)
     plt.imshow(im3,vmin=0,vmax=4)
     plt.title("UNet predicted mask",color="white")
-    plt.colorbar()
     plt.tight_layout()
     plt.axis('off')
     plt.savefig('demoimage.png',dpi=300,transparent=True)
