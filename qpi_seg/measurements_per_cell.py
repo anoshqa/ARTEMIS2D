@@ -12,22 +12,19 @@ import matplotlib.pyplot as plt
 import qpi_seg.visualize as vs
 
 #actually you put unseen image
-images_folder=r'/mnt/efs/dl_jrc/student_data/S-DC/MIP_unseen_padded'
+images_folder=r'C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\UNSEEN_MIP_1'
 
 
-cellpose_mask_folder=r'/mnt/efs/dl_jrc/student_data/S-DC/Masks_unseen_cellpose'
+cellpose_mask_folder=r'C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\UNSEEN_MIP_1_CELL_MASK'
 
-unet_mask_folder=r'/mnt/efs/dl_jrc/student_data/S-DC/Masks_padded_final'
+unet_mask_folder=r'C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\UNSEEN_UNET_MASK'
 
+output_folder=r'C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\UNSEEN_COMBINED_MASK'
 images=[tifffile.imread(os.path.join(images_folder,file)) for file in os.listdir(images_folder)]
 cp_masks=[tifffile.imread(os.path.join(cellpose_mask_folder,file)) for file in os.listdir(cellpose_mask_folder)]
 unet_masks=[tifffile.imread(os.path.join(unet_mask_folder,file)) for file in os.listdir(unet_mask_folder)]
 
-#image=tifffile.imread(os.path.join(image_original,'20240316.120455.453.MDA-MB231P-020_HT2D_0.tif_submask_204.png'))
-#cp_mask=tifffile.imread(os.path.join(images_folder,'20240316.120455.453.MDA-MB231P-020_HT2D_0.tif_submask_204_cp_masks.tiff'))
-#unet_mask=tifffile.imread(os.path.join(unet_mask_folder,'20240316.120455.453.MDA-MB231P-020_HT2D_0.tif_submask_204final.png'))
-#vs.visualize(image,unet_mask,unet_mask)
-
+out_file_name_stems=[os.path.splitext(file)[0][:30]+'_combined_masks'for file in os.listdir(images_folder)]
 
 #images to natural RI range
 images_RI= [image/1e4 for image in images ]
@@ -44,7 +41,9 @@ combined_masks=[]
 intensity_mean_all=[]
 area_all=[]
 intensity_std_all=[]
-for i in range(1):
+
+out_file_name_masks=[]
+for i in range(len(images_RI)):
     image=images_RI[i]
     cp_mask = cp_masks[i]
     unique_values=np.unique(cp_mask)
@@ -55,16 +54,27 @@ for i in range(1):
         mask2[mask2>0]=1
         #per cell semantic mask = cp_mask after filter x unet_masks[i]
         combined_mask = mask2 * unet_masks[i]
-        combined_mask=combined_mask.astype(np.int64)
-        props_table = skimage.measure.regionprops_table(combined_mask, intensity_image=image, properties=['label', 'intensity_mean','area','intensity_std'])
-        areas_all.append(np.array(props_table['area']))
-        intensity_mean_all.append(np.array(props_table['intensity_mean']))
-        intensity_std_all.append(np.array(props_table['intensity_std']))
         
-areas=pd.DataFrame(areas_all, columns =['Cell_area','Nucleus_area','Nucleolus_area','Lipid_area'])
-meanRI=pd.DataFrame(intensity_mean_all,columns=['Cell_RImean','Nucleus_RImean','Nucleolus_RImean','Lipid_RImean'])
-stdRI=pd.DataFrame(intensity_std_all,columns=['Cell_RIdtd','Nucleus_RIstd','Nucleolus_RIstd','Lipid_RIstd'])  
-featuresdf=pd.concat([areas,meanRI,stdRI],axis=1)            
+        mask2[combined_mask==2]=2
+        mask2[combined_mask==3]=3
+        mask2[combined_mask==4]=4
+        combined_mask2=mask2.astype(np.int64)
+        out_file_name_stem=f"{out_file_name_stems[i]}{submask_value}.tiff" 
+        out_file_name_masks.append(out_file_name_stem)
+        combined_masks.append(combined_mask2)
+        #props_table = skimage.measure.regionprops_table(combined_mask, intensity_image=image, properties=['label', 'intensity_mean','area','intensity_std'])
+        #areas_all.append(np.array(props_table['area']))
+        #intensity_mean_all.append(np.array(props_table['intensity_mean']))
+        #intensity_std_all.append(np.array(props_table['intensity_std']))
+for i in range(len(out_file_name_masks)):
+    tifffile.imwrite(
+        out_file_name_masks[i],
+        combined_masks[i].detach().cpu().numpy()
+    )
+#areas=pd.DataFrame(areas_all, columns =['Cell_area','Nucleus_area','Nucleolus_area','Lipid_area'])
+#meanRI=pd.DataFrame(intensity_mean_all,columns=['Cell_RImean','Nucleus_RImean','Nucleolus_RImean','Lipid_RImean'])
+#stdRI=pd.DataFrame(intensity_std_all,columns=['Cell_RIdtd','Nucleus_RIstd','Nucleolus_RIstd','Lipid_RIstd'])  
+#featuresdf=pd.concat([areas,meanRI,stdRI],axis=1)            
 #print(featuresdf.head())              
 
 #plt.imshow(cp_mask)
