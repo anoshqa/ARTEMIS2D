@@ -10,19 +10,19 @@ import numpy as np
 import pandas as pd
 #import qpi_seg.visualize_unseen_unmasked as visualize
 #actually you put unseen image
-images_folder=r'D:\TRAINING_DATA_FINAL\TEST_MIP'
+#images_folder=r'D:\TRAINING_DATA_FINAL\TEST_MIP'
 
 
 cellpose_mask_folder=r'C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\UNSEEN_MIP_1_CELL_MASK'
 
 unet_mask_folder=r'C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\UNSEEN_UNET_MASK'
 
-output_folder=r'C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\UNSEEN_COMBINED_MASK'
+output_folder=r'C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\Combined_mask_2'
 #images=[skimage.io.imread(os.path.join(images_folder,file)) for file in sorted(os.listdir(images_folder))]
 cp_masks=[skimage.io.imread(os.path.join(cellpose_mask_folder,file)) for file in sorted(os.listdir(cellpose_mask_folder))]
 unet_masks=[skimage.io.imread(os.path.join(unet_mask_folder,file)) for file in sorted(os.listdir(unet_mask_folder))]
 
-out_file_name_stems=[os.path.splitext(file)[0][:40]+'_combined_masks'for file in sorted(os.listdir(images_folder))]
+out_file_name_stems=[os.path.splitext(file)[0][:40]+'_combined_masks'for file in sorted(os.listdir(unet_mask_folder))]
 
 #images to natural RI range
 #images_RI= [image/1e4 for image in images ]
@@ -53,7 +53,7 @@ for i in range(len(cp_masks)):
         mask2[mask2>0]=1
         #per cell semantic mask = cp_mask after filter x unet_masks[i]
         combined_mask = mask2 * unet_masks[i]
-        combined_mask[mask2==1]=1
+        #combined_mask[mask2==1]=1
         out_file_name_stem=f"{out_file_name_stems[i]}_mask{submask_value}.tiff"
         print(out_file_name_stem)
         out_file_name_masks.append(os.path.join(output_folder,out_file_name_stem))
