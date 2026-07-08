@@ -21,8 +21,9 @@ val_image_stack = np.stack(val_images_org, axis=0)
 mask_files=os.listdir(output_mask_folder)
 
 masks_org=[tifffile.imread(os.path.join(output_mask_folder, file)) for file in mask_files]
-masks=[resize(mask, (418,418), anti_aliasing=True,preserve_range=True) for mask in masks_org]
-mask_stack = np.stack(masks, axis=0)
+masks=[resize(mask, (418,418), anti_aliasing=False,order=0) for mask in masks_org]
+masks_int=[mask.astype(np.uint8) for mask in masks]
+mask_stack = np.stack(masks_int, axis=0)
 
 print(f"val_image_stack shape: {val_image_stack.shape}")
 print(f"mask_stack shape: {mask_stack.shape}")
