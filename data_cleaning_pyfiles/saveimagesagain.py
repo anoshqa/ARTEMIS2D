@@ -5,11 +5,11 @@ import skimage
 from skimage.measure import label, regionprops
 import numpy as np
 import pandas as pd
-image_folder=r'D:\TRAINING_DATA_FINAL\TEST_MIP'
-cellpose_mask_folder=r'D:\TRAINING_DATA_FINAL\TEST_MIP_CELL_MASK'
+image_folder=r"C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\UNSEEN_MIP_1"
+cellpose_mask_folder=r"C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\UNSEEN_MIP_1_CELL_MASK"
 
 #also stores (418,418) for easier visualization
-output_folder=r'D:\TRAINING_DATA_FINAL\TEST_MIP_REPEATED'
+output_folder=r'C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\UNSEEN_MIP_1_REPEATED'
 
 images=[skimage.io.imread(os.path.join(image_folder,file)) for file in sorted(os.listdir(image_folder))]
 resized_images=[skimage.transform.resize(image, (418,418), anti_aliasing=True,preserve_range=True) for image in images]

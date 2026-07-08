@@ -17,7 +17,7 @@ cellpose_mask_folder=r'C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\
 
 unet_mask_folder=r'C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\UNSEEN_UNET_MASK'
 
-output_folder=r'C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\Combined_mask_2'
+output_folder=r'C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\combined_mask_2'
 #images=[skimage.io.imread(os.path.join(images_folder,file)) for file in sorted(os.listdir(images_folder))]
 cp_masks=[skimage.io.imread(os.path.join(cellpose_mask_folder,file)) for file in sorted(os.listdir(cellpose_mask_folder))]
 unet_masks=[skimage.io.imread(os.path.join(unet_mask_folder,file)) for file in sorted(os.listdir(unet_mask_folder))]
@@ -66,7 +66,7 @@ for i in range(len(cp_masks)):
 for i in range(len(out_file_name_masks)):
     tifffile.imwrite(
         out_file_name_masks[i],
-        combined_masks[i]
+        combined_masks[i].astype(np.uint16)
     )
 #areas=pd.DataFrame(areas_all, columns =['Cell_area','Nucleus_area','Nucleolus_area','Lipid_area'])
 #meanRI=pd.DataFrame(intensity_mean_all,columns=['Cell_RImean','Nucleus_RImean','Nucleolus_RImean','Lipid_RImean'])
