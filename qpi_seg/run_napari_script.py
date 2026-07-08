@@ -2,7 +2,6 @@ import napari
 import os
 import tifffile
 import numpy as np
-import torch
 from skimage.transform import resize
 
 
