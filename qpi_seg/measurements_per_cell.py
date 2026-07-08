@@ -48,16 +48,17 @@ for i in range(len(cp_masks)):
     unique_values=unique_values[unique_values>0] #remove background (0)
     print(unique_values)
     for submask_value in unique_values:
-        mask2=cp_mask.copy()
-        mask2[mask2 != submask_value] = 0
-        mask2[mask2>0]=1
+        mask2=cp_masks[i].copy()
+        unet_mask=unet_masks[i].copy()
+        unet_mask[mask2 != submask_value] = 0
+        mask2[mask2 !=submask_value]=0
+        mask2[mask2 >0]=1
+        unet_mask[(unet_mask==0) & (mask2==1)]=1
         #per cell semantic mask = cp_mask after filter x unet_masks[i]
-        combined_mask = mask2 * unet_masks[i]
-        #combined_mask[mask2==1]=1
         out_file_name_stem=f"{out_file_name_stems[i]}_mask{submask_value}.tiff"
         print(out_file_name_stem)
         out_file_name_masks.append(os.path.join(output_folder,out_file_name_stem))
-        combined_masks.append(combined_mask)
+        combined_masks.append(unet_mask)
         #props_table = skimage.measure.regionprops_table(combined_mask, intensity_image=image, properties=['label', 'intensity_mean','area','intensity_std'])
         #areas_all.append(np.array(props_table['area']))
         #intensity_mean_all.append(np.array(props_table['intensity_mean']))
