@@ -35,7 +35,7 @@ cropped_masks=[]
 w_list=[]
 h_list=[]
 out_file_name_masks_selected=[]
-for i in range(300,552):
+for i in range(1):
    
     w=val_images[i].shape[0]
     h=val_images[i].shape[1]
@@ -68,16 +68,16 @@ if __name__ == '__main__':
 # add the labels
     viewer.add_labels(mask_stack, name='segmentation')
     napari.run()
-for i in range(len(out_file_name_masks_selected)):
+#for i in range(len(out_file_name_masks_selected)):
    
-    w=w_list[i]
-    h=h_list[i]
-    edited_mask=mask_stack[i]
-    test_masks_resized.append(resize(edited_mask, (w,h),order=0,anti_aliasing=False))
-    tifffile.imwrite(
-        out_file_name_masks_selected[i],
-        test_masks_resized[i]
-    )
+#    w=w_list[i]
+#    h=h_list[i]
+#    edited_mask=mask_stack[i]
+#    test_masks_resized.append(resize(edited_mask, (w,h),order=0,anti_aliasing=False))
+#    tifffile.imwrite(
+#       out_file_name_masks_selected[i],
+#        test_masks_resized[i]
+#    )
 
 #visualize.visualize(val_images[0], test_masks_resized[0])
 #if 5 masks are not there use
