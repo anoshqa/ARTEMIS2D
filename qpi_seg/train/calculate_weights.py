@@ -3,7 +3,7 @@ import torch
 import tifffile
 from tqdm import tqdm
 import os
-import qpi_seg.split_mask_5_channels as split
+import qpi_seg.train.split_mask_5_channels as split
 import numpy as np
 #this function will pass the training folder's mask values
 def calculate_weights(mask_folder, mask_files):

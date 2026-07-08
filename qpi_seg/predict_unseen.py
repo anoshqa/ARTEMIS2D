@@ -8,7 +8,7 @@ import torch.nn as nn
 import matplotlib.pyplot as plt
 import numpy as np
 import qpi_seg.plot_grids as pg
-import qpi_seg.split_mask_5_channels as split
+import qpi_seg.train.split_mask_5_channels as split
 import qpi_seg.visualize_unseen_unmasked as visualize
 
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
@@ -47,7 +47,7 @@ out_file_name_stems=[os.path.splitext(file)[0][:30]+'_unet_masks.tiff'for file i
 out_file_name_masks=[os.path.join(unet_masks_output_folder, file) for file in out_file_name_stems]
 
 from_np=transforms_v2.Lambda(lambda x: torch.from_numpy(x))
-
+#this needs to be multiple of 32
 im_size=2240
 transform = transforms_v2.CenterCrop((im_size,im_size))
 

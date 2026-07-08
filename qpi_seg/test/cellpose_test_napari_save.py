@@ -68,6 +68,7 @@ if __name__ == '__main__':
 # add the labels
     viewer.add_labels(mask_stack, name='segmentation')
     napari.run()
+#for saving the corrected masks after napari:
 #for i in range(len(out_file_name_masks_selected)):
    
 #    w=w_list[i]

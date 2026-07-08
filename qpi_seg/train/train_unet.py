@@ -1,4 +1,4 @@
-import qpi_seg.dataset
+import qpi_seg.train.dataset
 import torch
 from torch.utils.data import DataLoader
 import numpy as np
@@ -7,15 +7,15 @@ from models.unet import UNet
 import torch.nn as nn
 import os
 import torchvision.transforms.v2 as transforms_v2
-import qpi_seg.file_charactersmatch as filetest
+import data_cleaning_pyfiles.file_charactersmatch as filetest
 import torch.nn.functional as F
-import qpi_seg.train_model as train_model
+import qpi_seg.train.train_model as train_model
 import qpi_seg.validate as validate
-import qpi_seg.launch_tensorboard as LT
+import qpi_seg.train.launch_tensorboard as LT
 #import qpi_seg.dicecoefficient as DC
 import subprocess
 import qpi_seg.mean_fn as mean
-import qpi_seg.calculate_weights as CW
+import qpi_seg.train.calculate_weights as CW
 from torch.utils.tensorboard import SummaryWriter
 
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
@@ -58,7 +58,7 @@ transform = transforms_v2.Compose([
     transforms_v2.RandomResizedCrop((1344,1344),antialias=True,scale=(0.75,1.25),interpolation=transforms_v2.InterpolationMode.NEAREST),
 ])
 
-trainQPIdataset=qpi_seg.dataset.MIPDataset(image_folder,mask_folder,train_image_files, train_mask_files,transform=transform,norm_setting="Dataset_min_max",norm_mean=None, norm_std=None,norm_min=13300,norm_max=14100) #original image is 836,836
+trainQPIdataset=qpi_seg.train.dataset.MIPDataset(image_folder,mask_folder,train_image_files, train_mask_files,transform=transform,norm_setting="Dataset_min_max",norm_mean=None, norm_std=None,norm_min=13300,norm_max=14100) #original image is 836,836
 
 
 #validationQPIdataset=qpi_seg.dataset.MIPDataset(image_folder,mask_folder,val_image_files, val_mask_files,transform=transforms_v2.CenterCrop((832,832)),norm_setting="Dataset_min_max",norm_mean=None, norm_std=None,norm_min=13300,norm_max=14100)

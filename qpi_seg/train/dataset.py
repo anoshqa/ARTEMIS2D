@@ -2,11 +2,11 @@ import os
 import torch
 from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
-import qpi_seg.file_charactersmatch as filetest
+import data_cleaning_pyfiles.file_charactersmatch as filetest
 import tifffile
 from tqdm import tqdm
 import torchvision.transforms.v2 as transforms_v2
-import qpi_seg.split_mask_5_channels as split
+import qpi_seg.train.split_mask_5_channels as split
     
 class MIPDataset(torch.utils.data.Dataset):
     def __init__(self, image_folder, mask_folder, image_files, mask_files,transform=None,norm_setting="",norm_mean=None, norm_std=None,norm_min=None,norm_max=None):

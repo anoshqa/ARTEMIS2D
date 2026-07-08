@@ -1,6 +1,6 @@
 #tasks
-#import cellpose masks
-#import unet masks
+#imports cellpose masks
+#imports unet masks
 
 import os
 import tifffile
@@ -8,7 +8,6 @@ import skimage
 from skimage.measure import label, regionprops
 import numpy as np
 import pandas as pd
-#import qpi_seg.visualize_unseen_unmasked as visualize
 #actually you put unseen image
 #images_folder=r'D:\TRAINING_DATA_FINAL\TEST_MIP'
 

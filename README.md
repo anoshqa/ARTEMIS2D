@@ -21,3 +21,23 @@ You will also need two saved models
 1. cellpose pre-trained model (trained on 700 breast cancer MIPs so far)
 2. UNet 
 
+# structure - 
+
+├── README.md                               <- Information 
+├── data_cleaning_pyfiles                   <- Contains misc files
+├── models                                  <- Contains unet.py and unet_tests
+├── qpi_seg                                 
+│   ├── train                               
+│   │   ├── train_unet.py                   <- for training UNet
+│   │   ├── cellpose2d_train.py             <- for fine-tuning Cellpose
+│   ├── test  
+│   │   ├── cellpose_test_napari_save.py    <- test cellpose, edit in napari and save in 'CP_MASK' folder
+│   │   ├── unet_test_save.py               <- test unet and save in 'UNET_MASK' folder
+│   │   ├── save_combined_mask.py           <- saves per-cell mask in 'COMBINED_MASK'
+│   │   ├── run_napari_script.py            <- proofread/final edit 'COMBINED_MASK' in napari, needs each cell-each MIP
+├── phenotyping
+│   ├── align - Align will be using 'FINAL_MIPs' and 'FINAL_MASKS'
+
+Acknowledgements
+The UNet code is adapted from [dl-janelia/unet](https://github.com/dl-janelia/unet/tree/19d9ba70acf047ada35954144cabb78284bbbcde).
+
