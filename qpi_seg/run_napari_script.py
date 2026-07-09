@@ -5,7 +5,7 @@ import numpy as np
 from skimage.transform import resize
 
 
-image_folder = r"C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\UNSEEN_MIP_1_REPEATED"
+image_folder = r"D:\TRAINING_DATA_FINAL\Remaining_MIP_repeated_resized"
 #import resized val images
 output_mask_folder = r"C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\combined_mask_2"
 #all val image files
