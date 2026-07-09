@@ -34,9 +34,12 @@ You will also need two saved models
 │   │   ├── cellpose_test_napari_save.py    <- test cellpose, edit in napari and save in 'CP_MASK' folder
 │   │   ├── unet_test_save.py               <- test unet and save in 'UNET_MASK' folder
 │   │   ├── save_combined_mask.py           <- saves per-cell mask in 'COMBINED_MASK'
-│   │   ├── run_napari_script.py            <- proofread/final edit 'COMBINED_MASK' in napari, needs each cell-each MIP
+│   │   ├── run_napari_script.py            <- a generic script for proofreading (edit/save corrected)
 ├── phenotyping
 │   ├── align - Align will be using 'FINAL_MIPs' and 'FINAL_MASKS'
+
+
+Ensure sorted(os.listdir) without sorting files may not match :)
 
 Acknowledgements
 The UNet code is adapted from [dl-janelia/unet](https://github.com/dl-janelia/unet/tree/19d9ba70acf047ada35954144cabb78284bbbcde).

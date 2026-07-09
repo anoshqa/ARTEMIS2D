@@ -4,20 +4,20 @@ import tifffile
 import numpy as np
 from skimage.transform import resize
 
-
+#original  images
 image_folder = r"D:\TRAINING_DATA_FINAL\Remaining_MIP_repeated_resized"
-#import resized val images
-output_mask_folder = r"C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\combined_mask_2"
-#all val image files
+#all mask files 
+output_mask_folder = r"C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\Remaining_MIP_combined_mask1"
+#corrected mask folder below
+corrected_mask_folder=r"C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\Remaining_MIP_combined_mask_corrected"
 
-corrected_mask_folder=r"C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\combined_corrected"
-
-
-val_image_files=os.listdir(image_folder)
+val_image_files=sorted(os.listdir(image_folder))[1000:]
 
 val_images_org=[tifffile.imread(os.path.join(image_folder, file)) for file in val_image_files]
-val_image_stack = np.stack(val_images_org, axis=0)
-mask_files=os.listdir(output_mask_folder)
+val_images=[resize(image, (418,418),order=0, anti_aliasing=False,preserve_range=True) for image in val_images_org]
+val_image_stack = np.stack(val_images, axis=0)
+
+mask_files=sorted(os.listdir(output_mask_folder))[1000:]
 
 masks_org=[tifffile.imread(os.path.join(output_mask_folder, file)).astype(np.uint16) for file in mask_files]
 masks=[resize(mask, (418,418),order=0, anti_aliasing=False,preserve_range=True) for mask in masks_org]
@@ -37,7 +37,7 @@ napari.run()
 
 
 for i in range(len(out_file_name_masks_selected)):
-    image=val_images_org[i]
+    image=masks_org[i]
     edited_mask=mask_stack[i]
     w=image.shape[0]
     h=image.shape[1]

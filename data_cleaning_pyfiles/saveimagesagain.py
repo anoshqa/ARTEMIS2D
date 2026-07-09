@@ -6,7 +6,7 @@ from skimage.measure import label, regionprops
 import numpy as np
 import pandas as pd
 image_folder=r"D:\TRAINING_DATA_FINAL\Remaining_MIP_from_storage"
-cellpose_mask_folder=r"D:\TRAINING_DATA_FINAL\Remaining_MIP_storage_cp_masks"
+cellpose_mask_folder=r"D:\TRAINING_DATA_FINAL\Remaining_MIP_storage_cp_masks_corrected"
 
 #also stores (418,418) for easier visualization
 output_folder=r'D:\TRAINING_DATA_FINAL\Remaining_MIP_repeated_resized'

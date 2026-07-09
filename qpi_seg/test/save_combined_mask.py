@@ -12,7 +12,7 @@ import pandas as pd
 #images_folder=r'D:\TRAINING_DATA_FINAL\TEST_MIP'
 
 
-cellpose_mask_folder=r'D:\TRAINING_DATA_FINAL\Remaining_MIP_storage_cp_masks'
+cellpose_mask_folder=r'D:\TRAINING_DATA_FINAL\Remaining_MIP_storage_cp_masks_corrected'
 
 unet_mask_folder=r'D:\TRAINING_DATA_FINAL\Remaining_MIP_storage_unet_masks'
 
@@ -45,15 +45,15 @@ for i in range(len(cp_files)):
     for submask_value in unique_values:
         mask2=cp_mask.copy()
         unet_mask2=unet_mask.copy()
-        unet_mask[mask2 != submask_value] = 0
+        unet_mask2[mask2 != submask_value] = 0
         mask2[mask2 !=submask_value]=0
         mask2[mask2 >0]=1
-        unet_mask[(unet_mask==0) & (mask2==1)]=1
+        unet_mask2[(unet_mask2==0) & (mask2==1)]=1
         #per cell semantic mask = cp_mask after filter x unet_masks[i]
         out_file_name_stem=f"{out_file_name_stems[i]}_mask{submask_value}.tiff"
         tifffile.imwrite(
             os.path.join(output_folder,out_file_name_stem),
-            unet_mask.astype(np.uint16)
+            unet_mask2.astype(np.uint16)
         )#props_table = skimage.measure.regionprops_table(combined_mask, intensity_image=image, properties=['label', 'intensity_mean','area','intensity_std'])
         #areas_all.append(np.array(props_table['area']))
         #intensity_mean_all.append(np.array(props_table['intensity_mean']))
