@@ -12,11 +12,11 @@ import pandas as pd
 #images_folder=r'D:\TRAINING_DATA_FINAL\TEST_MIP'
 
 
-cellpose_mask_folder=r'D:\TRAINING_DATA_FINAL\Remaining_MIP_storage_cp_masks_corrected'
+cellpose_mask_folder=r'C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\UNSEEN_MIP_1_CELL_MASK'
 
-unet_mask_folder=r'D:\TRAINING_DATA_FINAL\Remaining_MIP_storage_unet_masks'
+unet_mask_folder=r'C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\UNSEEN_UNET_MASK'
 
-output_folder=r'C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\Remaining_MIP_combined_mask1'
+output_folder=r'C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\UNSEEN_COMBINED_MASK'
 #images=[skimage.io.imread(os.path.join(images_folder,file)) for file in sorted(os.listdir(images_folder))]
 cp_files=sorted(os.listdir(cellpose_mask_folder))
 unet_files=sorted(os.listdir(unet_mask_folder))
