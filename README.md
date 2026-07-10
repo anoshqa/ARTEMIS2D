@@ -1,17 +1,5 @@
-# ARTEMIS2D
 
-**A** **R**ad **T**eam **E**very **M**ember **I**s **S**egmenting 2D
-
-Team project work from the Deep Learning for Microscopy Image Analysis course at Janelia. This repo contains the pipeline our team built to segment and phenotype cells from quantitative phase imaging (QPI) maximum intensity projections (MIPs) — combining a fine-tuned **Cellpose** model for instance segmentation with a custom **U-Net** for multi-channel semantic segmentation.
-
-![Python](https://img.shields.io/badge/python-3.13-blue)
-![License](https://img.shields.io/badge/license-MIT-green)
-
-<p align="center">
-  <img src="demoimage.png" width="45%" alt="Demo segmentation output">
-  <img src="grids_test.png" width="45%" alt="Grid test output">
-</p>
-
+Currently, the pipeline segments quantitative phase imaging (QPI) maximum intensity projections (MIPs) — combining a fine-tuned **Cellpose** model for instance segmentation with a custom **U-Net** for multi-channel semantic segmentation.
 ## Overview
 
 QPI MIP images are segmented in two complementary ways:
@@ -24,7 +12,7 @@ The two outputs are combined into a per-cell mask, which then feeds into downstr
 ## Repository structure
 
 ```
-├── README.md                  <- you are here
+├── README.md                  
 ├── environment.yml            <- conda environment spec
 ├── pyproject.toml
 ├── data_cleaning_pyfiles/     <- misc. data cleaning utilities
