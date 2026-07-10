@@ -4,11 +4,11 @@ import torchvision.transforms.v2 as transforms_v2
 import os
 import torch
 
-big_mip_folder=r'C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\MIP_stitched_align'
-big_mask_folder=r'C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\Mask_stitched_align'
+big_mip_folder=r'C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\phenotyping phase\MIP_aligned'
+big_mask_folder=r'C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\phenotyping phase\Combined_mask_aligned'
 
-output_mip_folder=r'C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\MIP_ALL'
-output_mask_folder=r'C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\MASK_ALL'
+output_mip_folder=r'C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\phenotyping phase\Cropped_MIP'
+output_mask_folder=r'C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\phenotyping phase\Cropped_Mask'
 
 
 transform = transforms_v2.CenterCrop((1344,1344))

@@ -5,13 +5,13 @@ import numpy as np
 from skimage.transform import resize
 
 # original images
-image_folder = r"D:\TRAINING_DATA_FINAL\Remaining_MIP_repeated_orgsize"
+image_folder = r"C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\phenotyping phase\Cropped_MIP"
 # all mask files
-output_mask_folder = r"C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\Remaining_MIP_combined_mask_corrected"
+output_mask_folder = r"C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\phenotyping phase\Cropped_Mask"
 # corrected mask folder below
-corrected_mask_folder = r"C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\Remaining_MIP_COMBINED_DEL"
+corrected_mask_folder = r"C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\phenotyping phase\Mask_proofread"
 # corrected/kept image folder (new — mirrors the surviving images)
-corrected_image_folder = r"D:\TRAINING_DATA_FINAL\Remaining_MIP_DEL"
+corrected_image_folder = r"C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\phenotyping phase\MIP_proofread"
 
 val_image_files = sorted(os.listdir(image_folder))
 
