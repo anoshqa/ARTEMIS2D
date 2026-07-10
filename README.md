@@ -1,46 +1,96 @@
-About qpi_seg folder:
+# ARTEMIS2D
 
-Cellpose is used for instance segmentation to identify different cell instances in a QPI MIP image. UNET is used to segment cell, nucleus, nucleolus, lipid droplet and background (5 channels) from QPI image
+**A** **R**ad **T**eam **E**very **M**ember **I**s **S**egmenting 2D
 
-Predict scripts - 
-For inferring masks from Unet: 'predict_unseen.py'. For inference from cellpose (afterfinetuning): 'cellpose_pretrained_eval.py', for inference from original cellpose: 'cellpose_eval.py'.
+Team project work from the Deep Learning for Microscopy Image Analysis course at Janelia. This repo contains the pipeline our team built to segment and phenotype cells from quantitative phase imaging (QPI) maximum intensity projections (MIPs) — combining a fine-tuned **Cellpose** model for instance segmentation with a custom **U-Net** for multi-channel semantic segmentation.
 
-To use the predict_unseen.py file you would need the saved model that is https://livejohnshopkins-my.sharepoint.com/:u:/g/personal/agupt130_jh_edu/IQCuq4fhppjxRbd9RnAlhxV_ARqKCvYyAgTsh4ZhQGkvFV4?e=fHOBhD
+![Python](https://img.shields.io/badge/python-3.13-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
 
-Instructions to start it working on PC (use VS studio terminal)
-1. git clone https://github.com/anoshqa/ARTEMIS2D
-2. ls artemis2d (to see files inside the folder)
-3. cd artemis2d (goes to artemis2d folder)
-once you are on the folder 
-4. conda create -n artemis2d (suggested name of new environment)
-5. conda install conda-forge::python==3.13.0
-6. pip3 install torch torchvision (for downloading torch on Windows without GPU)
-7. pip install cellpose
+<p align="center">
+  <img src="demoimage.png" width="45%" alt="Demo segmentation output">
+  <img src="grids_test.png" width="45%" alt="Grid test output">
+</p>
 
-You will also need two saved models 
-1. cellpose pre-trained model (trained on 700 breast cancer MIPs so far)
-2. UNet 
+## Overview
 
-# structure - 
+QPI MIP images are segmented in two complementary ways:
 
-├── README.md                               <- Information 
-├── data_cleaning_pyfiles                   <- Contains misc files
-├── models                                  <- Contains unet.py and unet_tests
-├── qpi_seg                                 
-│   ├── train                               
-│   │   ├── train_unet.py                   <- for training UNet
-│   │   ├── cellpose2d_train.py             <- for fine-tuning Cellpose
-│   ├── test  
-│   │   ├── cellpose_test_napari_save.py    <- test cellpose, edit in napari and save in 'CP_MASK' folder
-│   │   ├── unet_test_save.py               <- test unet and save in 'UNET_MASK' folder
-│   │   ├── save_combined_mask.py           <- saves per-cell mask in 'COMBINED_MASK'
-│   │   ├── run_napari_script.py            <- a generic script for proofreading (edit/save corrected)
-├── phenotyping
-│   ├── align - Align will be using 'FINAL_MIPs' and 'FINAL_MASKS'
+- **Cellpose** (fine-tuned) — instance segmentation, identifying individual cell instances within a QPI MIP image.
+- **U-Net** — semantic segmentation into five channels: cell, nucleus, nucleolus, lipid droplet, and background.
 
+The two outputs are combined into a per-cell mask, which then feeds into downstream phenotyping (alignment and feature extraction on `FINAL_MIPs` / `FINAL_MASKS`).
 
-Ensure sorted(os.listdir) without sorting files may not match :)
+## Repository structure
 
-Acknowledgements
-The UNet code is adapted from [dl-janelia/unet](https://github.com/dl-janelia/unet/tree/19d9ba70acf047ada35954144cabb78284bbbcde).
+```
+├── README.md                  <- you are here
+├── environment.yml            <- conda environment spec
+├── pyproject.toml
+├── data_cleaning_pyfiles/     <- misc. data cleaning utilities
+├── models/                    <- unet.py and unet_tests
+├── qpi_seg/
+│   ├── train/
+│   │   ├── train_unet.py           <- train the U-Net
+│   │   └── cellpose2d_train.py     <- fine-tune Cellpose
+│   └── test/
+│       ├── cellpose_test_napari_save.py  <- run Cellpose, edit in napari, save to CP_MASK/
+│       ├── unet_test_save.py              <- run U-Net, save to UNET_MASK/
+│       ├── save_combined_mask.py          <- combine per-cell masks into COMBINED_MASK/
+│       └── run_napari_script.py           <- generic napari proofreading script
+├── phenotyping/
+│   └── align/                 <- alignment using FINAL_MIPs and FINAL_MASKS
+└── runs/Unet/                 <- training run logs and outputs
+```
 
+> **Note:** file ordering is not guaranteed by `os.listdir` — always use `sorted(os.listdir(...))` when matching MIPs to masks.
+
+## Inference scripts
+
+| Script | Purpose |
+|---|---|
+| `predict_unseen.py` | Predict masks on new data using the trained U-Net |
+| `cellpose_pretrained_eval.py` | Inference using the fine-tuned Cellpose model |
+| `cellpose_eval.py` | Inference using the original (non-fine-tuned) Cellpose model |
+
+You'll need two saved models to run inference:
+1. **Cellpose (fine-tuned)** — trained on ~700 breast cancer MIPs
+2. **U-Net** — [download link](https://livejohnshopkins-my.sharepoint.com/:u:/g/personal/agupt130_jh_edu/IQCuq4fhppjxRbd9RnAlhxV_ARqKCvYyAgTsh4ZhQGkvFV4?e=fHOBhD)
+
+## Setup
+
+```bash
+git clone https://github.com/anoshqa/ARTEMIS2D
+cd ARTEMIS2D
+```
+
+Create the environment from `environment.yml` (recommended — pulls in the exact versions we tested with, including PyTorch, Cellpose, and scikit-image):
+
+```bash
+conda env create -f environment.yml
+conda activate artemis2d
+```
+
+Alternatively, for a manual/lightweight setup (e.g. CPU-only on Windows):
+
+```bash
+conda create -n artemis2d python=3.13
+conda activate artemis2d
+pip install torch torchvision   # CPU build if no local GPU
+pip install cellpose
+```
+
+## Training loss
+
+<p align="center">
+  <img src="training_test_loss-20260616-221441.png" width="45%" alt="Training/test loss run 1">
+  <img src="training_test_loss-20260623-111923.png" width="45%" alt="Training/test loss run 2">
+</p>
+
+## Acknowledgements
+
+U-Net implementation adapted from [dl-janelia/unet](https://github.com/dl-janelia/unet/tree/19d9ba70acf047ada35954144cabb78284bbbcde).
+
+## License
+
+Released under the [MIT License](LICENSE).
