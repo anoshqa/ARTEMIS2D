@@ -7,9 +7,9 @@ from models.unet import UNet
 import torch.nn as nn
 import matplotlib.pyplot as plt
 import numpy as np
-import qpi_seg.plot_grids as pg
+import qpi_seg.visualizing_utils.plot_grids as pg
 import qpi_seg.train.split_mask_5_channels as split
-import qpi_seg.visualize_unseen_unmasked as visualize
+import qpi_seg.visualizing_utils.visualize_unseen_unmasked as visualize
 
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 #assert torch.cuda.is_available()

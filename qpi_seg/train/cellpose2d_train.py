@@ -6,12 +6,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 from glob import glob
 from pathlib import Path
-import qpi_seg.visualize as visual_test
+import qpi_seg.visualizing_utils.visualize as visual_test
 import os
 import tifffile
 from datetime import datetime
 import torchvision.transforms.v2 as transforms_v2
-import qpi_seg.visualize as visual_test
+import qpi_seg.visualizing_utils.visualize as visual_test
 from skimage.transform import resize
 def graph_losses(train_losses, test_losses):
     plt.figure(figsize=(6, 4), dpi=150)

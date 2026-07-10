@@ -10,7 +10,7 @@ import torchvision.transforms.v2 as transforms_v2
 import data_cleaning_pyfiles.file_charactersmatch as filetest
 import torch.nn.functional as F
 import qpi_seg.train.train_model as train_model
-import qpi_seg.validate as validate
+import qpi_seg.train.validate as validate
 import qpi_seg.train.launch_tensorboard as LT
 #import qpi_seg.dicecoefficient as DC
 import subprocess
