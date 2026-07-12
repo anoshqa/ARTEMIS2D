@@ -56,7 +56,7 @@ with torch.no_grad():
         del batch_tensors, features_dict, features
         torch.cuda.empty_cache()
 
-        print(f"Processed {min(i+batch_size, len(images))}/{len(images)} images")
+        print(f"Processed {min(i+batch_size, len(masks))}/{len(masks)} images")
 
 # Concatenate all on CPU
 total_features = torch.cat(total_features, dim=0)
