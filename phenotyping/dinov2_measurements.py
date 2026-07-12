@@ -21,26 +21,25 @@ transform1 = transforms.Compose([  # Resize here
 #imports images
 mask_folder=r'C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\phenotyping phase\Mask_proofread'
 
-masks=masks=[skimage.io.imread(os.path.join(mask_folder, maskfile) for maskfile in sorted(os.listdir(mask_folder)))]
-mask_resized = [resize(image, (418, 418), order=0, anti_aliasing=False, preserve_range=True) for image in val_images_org]
+masks=[skimage.io.imread(os.path.join(mask_folder, maskfile) for maskfile in sorted(os.listdir(mask_folder)))]
+mask_resized = [resize(image, (420, 420), order=0, anti_aliasing=False, preserve_range=True) for image in masks]
 patch_size = dinov2_vits14.patch_size # patchsize=14
 
 #520//14
-patch_h  = 112
-patch_w  = 112
+patch_h  = 30
+patch_w  = 30
 feat_dim = 384 # vits14
 #feat_dim = 768 # vitb14
 #feat_dim = 1024 # vitl14
 # feat_dim = 1536 # vitg14
-batch_size = 8  # T4 can handle this
 total_features = []
 
-batch_size = 8  # Adjust based on your GPU memory
+batch_size = 4  
 total_features = []
 
 with torch.no_grad():
     for i in range(0, len(masks), batch_size):
-        batch_images = images[i:i+batch_size]
+        batch_images = masks[i:i+batch_size]
 
         # Stack batch
         batch_tensors = torch.stack([transform1(img) for img in batch_images])
@@ -63,4 +62,4 @@ with torch.no_grad():
 total_features = torch.cat(total_features, dim=0)
 print(f"Final features shape: {total_features.shape}")
 featuresdf=pd.DataFrame(total_features.numpy())
-featuresdf.to_csv('dino_features.csv')
+featuresdf.to_csv('dino_features_masks.csv')
