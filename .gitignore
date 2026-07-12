@@ -12,6 +12,7 @@ __pycache__/
 runs/*
 checkpoints_unet1/*
 checkpoints_unet2/*
+phenotyping/unsupervised_analysis/onlyhc_features/*
 swati
 # Distribution / packaging
 .Python
