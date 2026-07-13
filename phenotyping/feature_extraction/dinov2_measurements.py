@@ -19,13 +19,16 @@ transform1 = transforms.Compose([
 ])
 
 
+filenames = []
+folder_path = r"phenotyping\feature_extraction\Mask_resized_dino" 
+masks=[]
+with torch.no_grad():
+  for img_name in os.listdir(folder_path):
+    img_path = os.path.join(folder_path, img_name)
+    img = Image.open(img_path).convert('RGB')
+    masks.append(img)
+    filenames.append(img_name)
 
-
-#imports images
-mask_folder=r'F:\TRAINING_DATA_FINAL\Mask_resized_dino'
-
-masks=[skimage.io.imread(os.path.join(mask_folder, maskfile)) for maskfile in sorted(os.listdir(mask_folder))]
-print(masks[0].shape)
     
 patch_size = dinov2_vits14.patch_size # patchsize=14
 
