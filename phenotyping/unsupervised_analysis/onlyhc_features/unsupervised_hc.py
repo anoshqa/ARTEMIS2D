@@ -86,6 +86,6 @@ selected_idx = grid.umap_grid_bin_thumbnails(
     n_bins_y = 20,
     zoom=0.5,
     place_at="bin_center",
-    pick="closest_to_center" ,
+    pick="max_area" ,
     filepath="phenotyping\\unsupervised_analysis\\onlyhc_features\\umap_grid.svg"
 )
