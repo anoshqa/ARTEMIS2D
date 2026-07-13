@@ -23,7 +23,7 @@ filenames = []
 folder_path = r"phenotyping\feature_extraction\Mask_resized_dino" 
 masks=[]
 with torch.no_grad():
-  for img_name in os.listdir(folder_path):
+  for img_name in sorted(os.listdir(folder_path)):
     img_path = os.path.join(folder_path, img_name)
     img = Image.open(img_path).convert('RGB')
     masks.append(img)
@@ -72,4 +72,5 @@ with torch.no_grad():
 total_features = torch.cat(total_features, dim=0)
 print(f"Final features shape: {total_features.shape}")
 featuresdf=pd.DataFrame(total_features.numpy())
-featuresdf.to_csv('dino_features_masks.csv')
+featuresdf.insert(0, 'mask_file', filenames)
+featuresdf.to_csv('dino_features_masks.csv', index=False)
