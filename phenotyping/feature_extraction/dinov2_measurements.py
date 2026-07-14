@@ -20,7 +20,7 @@ transform1 = transforms.Compose([
 
 
 filenames = []
-folder_path = r"phenotyping\feature_extraction\Mask_resized_dino" 
+folder_path = r"D:\TRAINING_DATA_FINAL\MIP_Cell_masked" 
 masks=[]
 with torch.no_grad():
   for img_name in sorted(os.listdir(folder_path)):
@@ -33,8 +33,8 @@ with torch.no_grad():
 patch_size = dinov2_vits14.patch_size # patchsize=14
 
 #520//14
-patch_h  = 30
-patch_w  = 30
+patch_h  = 96
+patch_w  = 96
 feat_dim = 384 # vits14
 #feat_dim = 768 # vitb14
 #feat_dim = 1024 # vitl14
@@ -73,4 +73,4 @@ total_features = torch.cat(total_features, dim=0)
 print(f"Final features shape: {total_features.shape}")
 featuresdf=pd.DataFrame(total_features.numpy())
 featuresdf.insert(0, 'mask_file', filenames)
-featuresdf.to_csv('dino_features_masks.csv', index=False)
+featuresdf.to_csv('dino_features_mip_masked.csv', index=False)
