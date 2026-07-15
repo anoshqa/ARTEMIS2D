@@ -12,7 +12,8 @@ images_folder=r'C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\p
 
 
 combined_mask_folder=r'C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\phenotyping phase\Mask_proofread'
-
+cell_mask_folder=r'C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\phenotyping phase\Cell_mask_cleaned'
+nucleus_mask_folder=r'C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\phenotyping phase\Nucleus_mask_cleaned'
 image_files = sorted(os.listdir(images_folder))
 mask_files = sorted(os.listdir(combined_mask_folder))
 
@@ -24,18 +25,6 @@ pixel_size_um = 0.095
 pixel_area_um2 = pixel_size_um ** 2
 def intensity_std(mask, intensity):
     return np.std(intensity[mask])
-def clean_channel_mask(channel_mask):
-    binary_mask = channel_mask.astype(bool)
-    binary_mask = binary_fill_holes(binary_mask)
-
-    if binary_mask.any():
-        labeled_mask, num_labels = ndi_label(binary_mask)
-        if num_labels > 1:
-            component_sizes = np.bincount(labeled_mask.ravel())
-            largest_label = np.argmax(component_sizes[1:]) + 1
-            binary_mask = labeled_mask == largest_label
-
-    return binary_mask.astype(int)
 
 feature_rows = []
 cols_to_drop = [
@@ -51,10 +40,7 @@ for idx in range(len(image_files)):
     image = skimage.io.imread(os.path.join(images_folder, image_files[idx]))/1e4
     combined_mask=skimage.io.imread(os.path.join(combined_mask_folder,mask_files[idx]))
     
-    channeled_mask = split.split_into_channels(from_np(combined_mask))
-    unstacked_masks = torch.unbind(channeled_mask, dim=0)
-    cell_mask= unstacked_masks[1].squeeze().numpy()
-    cell_mask_cleaned=clean_channel_mask(cell_mask)
+    cell_mask_cleaned=skimage.io.imread(os.path.join(cell_mask_folder,mask_files[idx]))
     cellprops = skimage.measure.regionprops_table(cell_mask_cleaned.astype(int), intensity_image=np.asarray(image),properties=['area', 'mean_intensity', 'convex_area', 'perimeter', 'axis_major_length', 'axis_minor_length', 'extent', 'eccentricity', 'solidity', 'feret_diameter_max', 'moments_hu'])
     cellprops_df=pd.DataFrame(cellprops)
     cellprops_df = cellprops_df.add_prefix("cell_")
@@ -76,7 +62,7 @@ for idx in range(len(image_files)):
     if "cell_feret_diameter_max" in cellprops_df.columns:
         cellprops_df["cell_feret_diameter_max_um"] = cellprops_df["cell_feret_diameter_max"] * pixel_size_um
     
-
+    
     cellprops_df = cellprops_df.drop(
     columns=[c for c in cols_to_drop if c in cellprops_df.columns]
     )

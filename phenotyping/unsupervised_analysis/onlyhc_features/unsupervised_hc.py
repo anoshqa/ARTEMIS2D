@@ -26,6 +26,7 @@ def get_pca_component_for_variance(adata, variance_threshold=0.90):
     return len(cumvar)
 
 prop=pd.read_csv('hc_features.csv')
+print('NaN count before cleaning:', prop.isna().sum().sum())
 prop = prop.dropna(axis=0, how='any').reset_index(drop=True)
 propnumeric=prop.drop(columns=['Type','image_file','mask_file'])
 masklist=prop['mask_file'].tolist()
