@@ -39,15 +39,24 @@ OUTPUT_PATH = 'cp_measure_features.csv'
 # Populated once per worker process by _init_worker, not pickled across processes.
 measurements = None
 correlation_measurements = None
+core_feature_names = None
+
+# Must survive get_granularity's subsample_size=0.1 downsampling with margin
+# to spare for its element_size=10 erosion, or it degenerates to a zero-size
+# array and crashes - hence 256x256, not a token few pixels.
+_TEMPLATE_MASK = np.zeros((256, 256), dtype=np.int32)
+_TEMPLATE_MASK[38:218, 38:218] = 1
+_TEMPLATE_PIXELS = np.random.default_rng(0).random((256, 256))
 
 
 def _init_worker():
-    global measurements, correlation_measurements
+    global measurements, correlation_measurements, core_feature_names
     # cp_measure/skimage 0.26 API deprecation, not actionable from here.
     warnings.filterwarnings("ignore", category=FutureWarning, module="cp_measure")
     # Expected when a class (e.g. lipid, nucleoli) is absent from a crop's ROI;
-    # the resulting correlation features are legitimately NaN, not a bug.
+    # the resulting correlation/radial features are legitimately NaN, not a bug.
     warnings.filterwarnings("ignore", category=ConstantInputWarning)
+    warnings.filterwarnings("ignore", message="invalid value encountered", category=RuntimeWarning)
 
     measurements = get_core_measurements()
     measurements["granularity"] = functools.partial(
@@ -57,8 +66,18 @@ def _init_worker():
     )
     correlation_measurements = get_correlation_measurements()
 
+    # Column names a real object would produce, used to NaN-fill rows for
+    # crops where a mask (e.g. a missing nucleus) has zero foreground pixels -
+    # some measurements (e.g. get_zernike, via centrosome) hard-crash on an
+    # empty object instead of returning NaN, so those must never be called on one.
+    core_feature_names = []
+    for _, func in measurements.items():
+        core_feature_names.extend(func(_TEMPLATE_MASK, _TEMPLATE_PIXELS).keys())
+
 
 def measure_single_object(binary_mask, pixels, prefix):
+    if not binary_mask.any():
+        return pd.DataFrame({name: [np.nan] for name in core_feature_names}).add_prefix(prefix)
     label_mask = binary_mask.astype(np.int32)
     results = {}
     for _, func in measurements.items():
