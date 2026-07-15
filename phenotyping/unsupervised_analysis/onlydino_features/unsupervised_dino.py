@@ -26,7 +26,7 @@ def get_pca_component_for_variance(adata, variance_threshold=0.90):
     return len(cumvar)
 
 prophc=pd.read_csv('hc_features_cleaned.csv')
-propdino=pd.read_csv('dino_features_masks_cleaned.csv')
+propdino=pd.read_csv('dino_features_mip_masks.csv')
 masklist=prophc['mask_file'].tolist()
 supervised_labels = np.array(prophc['Type'])
 propnumeric=propdino.drop(columns=['mask_file'])

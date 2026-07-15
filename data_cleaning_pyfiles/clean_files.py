@@ -13,7 +13,7 @@ def get_base_name(filename):
 
 
 prop = pd.read_csv('hc_features.csv')
-propdino = pd.read_csv('dino_features_masks.csv')
+propdino = pd.read_csv('dino_features_mip_masked.csv')
 
 prop = prop.dropna(axis=0, how='any').reset_index(drop=True)
 prop['mask_key'] = prop['mask_file'].astype(str).apply(get_base_name)
@@ -42,6 +42,6 @@ supervised_labels = np.array(prop['Type'])
 print('NaN count after cleaning:', propnumeric.isna().sum().sum())
 prop.to_csv('hc_features_cleaned.csv', index=False)
 
-matched_dino.to_csv('dino_features_masks_cleaned.csv', index=False)
+matched_dino.to_csv('dino_features_mip_cleaned.csv', index=False)
 
 print(f'Cleaned {len(prop)} handcrafted rows and {len(matched_dino)} DINO rows.')

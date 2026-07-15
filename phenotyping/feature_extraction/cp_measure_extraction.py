@@ -104,9 +104,19 @@ def measure_pairwise_colocalization(image, combined_mask):
     return pd.DataFrame(results)
 
 
+RAW_INTENSITY_MIN = 13300.0
+RAW_INTENSITY_MAX = 14100.0
+
+
 def process_crop(image_file, combined_mask_file, cell_mask_file, nucleus_mask_file):
-    image = skimage.io.imread(os.path.join(images_folder, image_file)) / 1e4
-    image = np.clip(image, 0, 1).astype(np.float64)
+    # cp_measure's skimage-backed measurements require float images bounded
+    # in [0, 1]. Raw QPI values only span ~13300-14100, so min-max scale to
+    # that observed range (not a fixed divisor) to use the full [0,1] output
+    # range and keep real contrast; clip only catches rare outlier pixels
+    # past 14100, not a systematic flattening like clipping raw/1e4 did.
+    raw = skimage.io.imread(os.path.join(images_folder, image_file)).astype(np.float64)
+    image = (raw - RAW_INTENSITY_MIN) / (RAW_INTENSITY_MAX - RAW_INTENSITY_MIN)
+    image = np.clip(image, 0, 1)
 
     combined_mask = skimage.io.imread(os.path.join(combined_mask_folder, combined_mask_file))
     cell_mask = skimage.io.imread(os.path.join(cell_mask_folder, cell_mask_file)) > 0
