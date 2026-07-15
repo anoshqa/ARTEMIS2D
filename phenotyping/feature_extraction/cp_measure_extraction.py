@@ -1,3 +1,4 @@
+import concurrent.futures
 import functools
 import itertools
 import os
@@ -12,15 +13,13 @@ from tqdm import tqdm
 from cp_measure.bulk import get_core_measurements, get_correlation_measurements
 from cp_measure.core.measuregranularity import get_granularity
 
-# cp_measure/skimage 0.26 API deprecation, not actionable from here.
-warnings.filterwarnings("ignore", category=FutureWarning, module="cp_measure")
-# Expected when a class (e.g. lipid, nucleoli) is absent from a crop's ROI;
-# the resulting correlation features are legitimately NaN, not a bug.
-warnings.filterwarnings("ignore", category=ConstantInputWarning)
-
 # cp_measure's docs note granularity is ~80% of runtime; downsample it for speed.
 GRANULARITY_SUBSAMPLE_SIZE = 0.1
 GRANULARITY_IMAGE_SAMPLE_SIZE = 0.1
+
+# One worker process per core by default. Lower this if the machine is shared
+# with other users/jobs.
+MAX_WORKERS = os.cpu_count()
 
 images_folder = r'D:\TRAINING_DATA_FINAL\Phenotyping_phase\phenotyping phase\MIP_proofread'
 combined_mask_folder = r'D:\TRAINING_DATA_FINAL\Phenotyping_phase\phenotyping phase\Mask_proofread'
@@ -37,29 +36,26 @@ CHANNEL_LABELS = {
 
 OUTPUT_PATH = 'cp_measure_features.csv'
 
-image_files = sorted(os.listdir(images_folder))
-combined_mask_files = sorted(os.listdir(combined_mask_folder))
-cell_mask_files = sorted(os.listdir(cell_mask_folder))
-nucleus_mask_files = sorted(os.listdir(nucleus_mask_folder))
+# Populated once per worker process by _init_worker, not pickled across processes.
+measurements = None
+correlation_measurements = None
 
-if not (len(image_files) == len(combined_mask_files) == len(cell_mask_files) == len(nucleus_mask_files)):
-    raise ValueError(
-        f"File count mismatch: {len(image_files)} images, {len(combined_mask_files)} combined masks, "
-        f"{len(cell_mask_files)} cell masks, {len(nucleus_mask_files)} nucleus masks"
+
+def _init_worker():
+    global measurements, correlation_measurements
+    # cp_measure/skimage 0.26 API deprecation, not actionable from here.
+    warnings.filterwarnings("ignore", category=FutureWarning, module="cp_measure")
+    # Expected when a class (e.g. lipid, nucleoli) is absent from a crop's ROI;
+    # the resulting correlation features are legitimately NaN, not a bug.
+    warnings.filterwarnings("ignore", category=ConstantInputWarning)
+
+    measurements = get_core_measurements()
+    measurements["granularity"] = functools.partial(
+        get_granularity,
+        subsample_size=GRANULARITY_SUBSAMPLE_SIZE,
+        image_sample_size=GRANULARITY_IMAGE_SAMPLE_SIZE,
     )
-
-# Resume support: skip crops already written by a previous (interrupted) run.
-already_processed = set()
-if os.path.exists(OUTPUT_PATH):
-    already_processed = set(pd.read_csv(OUTPUT_PATH, usecols=["image_file"])["image_file"])
-
-measurements = get_core_measurements()
-measurements["granularity"] = functools.partial(
-    get_granularity,
-    subsample_size=GRANULARITY_SUBSAMPLE_SIZE,
-    image_sample_size=GRANULARITY_IMAGE_SAMPLE_SIZE,
-)
-correlation_measurements = get_correlation_measurements()
+    correlation_measurements = get_correlation_measurements()
 
 
 def measure_single_object(binary_mask, pixels, prefix):
@@ -89,17 +85,7 @@ def measure_pairwise_colocalization(image, combined_mask):
     return pd.DataFrame(results)
 
 
-remaining = [
-    files for files in zip(image_files, combined_mask_files, cell_mask_files, nucleus_mask_files)
-    if files[0] not in already_processed
-]
-if already_processed:
-    print(f"Resuming: {len(already_processed)} crops already in {OUTPUT_PATH}, {len(remaining)} left")
-
-header_written = os.path.exists(OUTPUT_PATH)
-progress = tqdm(remaining, total=len(remaining))
-for image_file, combined_mask_file, cell_mask_file, nucleus_mask_file in progress:
-    progress.set_description(image_file)
+def process_crop(image_file, combined_mask_file, cell_mask_file, nucleus_mask_file):
     image = skimage.io.imread(os.path.join(images_folder, image_file)) / 1e4
     image = np.clip(image, 0, 1).astype(np.float64)
 
@@ -111,7 +97,7 @@ for image_file, combined_mask_file, cell_mask_file, nucleus_mask_file in progres
     nucleus_df = measure_single_object(nucleus_mask, image, "nucleus_")
     coloc_df = measure_pairwise_colocalization(image, combined_mask)
 
-    row = pd.concat(
+    return pd.concat(
         [
             pd.DataFrame({
                 "image_file": [image_file],
@@ -125,5 +111,47 @@ for image_file, combined_mask_file, cell_mask_file, nucleus_mask_file in progres
         ],
         axis=1,
     )
-    row.to_csv(OUTPUT_PATH, mode='a', header=not header_written, index=False)
-    header_written = True
+
+
+def main():
+    image_files = sorted(os.listdir(images_folder))
+    combined_mask_files = sorted(os.listdir(combined_mask_folder))
+    cell_mask_files = sorted(os.listdir(cell_mask_folder))
+    nucleus_mask_files = sorted(os.listdir(nucleus_mask_folder))
+
+    if not (len(image_files) == len(combined_mask_files) == len(cell_mask_files) == len(nucleus_mask_files)):
+        raise ValueError(
+            f"File count mismatch: {len(image_files)} images, {len(combined_mask_files)} combined masks, "
+            f"{len(cell_mask_files)} cell masks, {len(nucleus_mask_files)} nucleus masks"
+        )
+
+    # Resume support: skip crops already written by a previous (interrupted) run.
+    already_processed = set()
+    if os.path.exists(OUTPUT_PATH):
+        already_processed = set(pd.read_csv(OUTPUT_PATH, usecols=["image_file"])["image_file"])
+
+    remaining = [
+        files for files in zip(image_files, combined_mask_files, cell_mask_files, nucleus_mask_files)
+        if files[0] not in already_processed
+    ]
+    if already_processed:
+        print(f"Resuming: {len(already_processed)} crops already in {OUTPUT_PATH}, {len(remaining)} left")
+    print(f"Processing {len(remaining)} crops with {MAX_WORKERS} worker processes")
+
+    header_written = os.path.exists(OUTPUT_PATH)
+
+    with concurrent.futures.ProcessPoolExecutor(max_workers=MAX_WORKERS, initializer=_init_worker) as executor:
+        futures = {executor.submit(process_crop, *files): files[0] for files in remaining}
+        for future in tqdm(concurrent.futures.as_completed(futures), total=len(futures)):
+            image_file = futures[future]
+            try:
+                row = future.result()
+            except Exception as exc:
+                print(f"FAILED: {image_file}: {exc}")
+                continue
+            row.to_csv(OUTPUT_PATH, mode='a', header=not header_written, index=False)
+            header_written = True
+
+
+if __name__ == "__main__":
+    main()
