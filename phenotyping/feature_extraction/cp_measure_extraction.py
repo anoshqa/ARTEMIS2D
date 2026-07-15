@@ -22,10 +22,10 @@ warnings.filterwarnings("ignore", category=ConstantInputWarning)
 GRANULARITY_SUBSAMPLE_SIZE = 0.1
 GRANULARITY_IMAGE_SAMPLE_SIZE = 0.1
 
-images_folder = r'C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\phenotyping phase\MIP_proofread'
-combined_mask_folder = r'C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\phenotyping phase\Mask_proofread'
-cell_mask_folder = r'C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\phenotyping phase\Cell_mask_cleaned'
-nucleus_mask_folder = r'C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\phenotyping phase\Nucleus_mask_cleaned'
+images_folder = r'D:\TRAINING_DATA_FINAL\Phenotyping_phase\phenotyping phase\MIP_proofread'
+combined_mask_folder = r'D:\TRAINING_DATA_FINAL\Phenotyping_phase\phenotyping phase\Mask_proofread'
+cell_mask_folder = r'D:\TRAINING_DATA_FINAL\Phenotyping_phase\phenotyping phase\Cell_mask_cleaned'
+nucleus_mask_folder = r'D:\TRAINING_DATA_FINAL\Phenotyping_phase\phenotyping phase\Nucleus_mask_cleaned'
 
 # label values produced by qpi_seg.train.split_mask_5_channels.split_into_channels
 CHANNEL_LABELS = {
