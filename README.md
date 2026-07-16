@@ -24,6 +24,7 @@ The two outputs are combined into a per-cell mask, which then feeds into downstr
 │       └── run_napari_script.py           <- generic napari proofreading script
 ├── phenotyping/
 │   └── align/                 <- alignment using FINAL_MIPs and FINAL_MASKS
+
 ├── environment.yml            <- conda environment spec
 ├── pyproject.toml
 └── runs/Unet/                 <- training run logs and outputs
