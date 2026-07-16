@@ -26,13 +26,11 @@ combined_mask_folder = r'D:\TRAINING_DATA_FINAL\Phenotyping_phase\phenotyping ph
 cell_mask_folder = r'D:\TRAINING_DATA_FINAL\Phenotyping_phase\phenotyping phase\Cell_mask_cleaned'
 nucleus_mask_folder = r'D:\TRAINING_DATA_FINAL\Phenotyping_phase\phenotyping phase\Nucleus_mask_cleaned'
 
-# label values produced by qpi_seg.train.split_mask_5_channels.split_into_channels
-CHANNEL_LABELS = {
-    1: "cytoplasm",
-    2: "nucleoplasm",
-    3: "nucleoli",
-    4: "lipid",
-}
+# label values produced by qpi_seg.train.split_mask_5_channels.split_into_channels,
+# used only to pull out the nucleoli/lipid sub-regions below - cell/nucleus
+# come from their own whole-region masks instead (see measure_pairwise_colocalization).
+NUCLEOLI_LABEL = 3
+LIPID_LABEL = 4
 
 OUTPUT_PATH = 'cp_measure_features.csv'
 
@@ -85,19 +83,31 @@ def measure_single_object(binary_mask, pixels, prefix):
     return pd.DataFrame(results).add_prefix(prefix)
 
 
-def grayscale_channel(image, combined_mask, label):
-    return np.where(combined_mask == label, image, 0.0)
+def grayscale_channel(image, mask):
+    return np.where(mask, image, 0.0)
 
 
-def measure_pairwise_colocalization(image, combined_mask):
+def measure_pairwise_colocalization(image, cell_mask, nucleus_mask, combined_mask):
+    # cell/nucleus use their own whole-region masks (nucleus_mask is a genuine
+    # subset of cell_mask, so overlap is real) rather than the combined_mask's
+    # mutually-exclusive cytoplasm/nucleoplasm partition, which by construction
+    # never overlaps anything and forces Manders/Costes/RWC to 0 for every cell.
+    # nucleoli/lipid still come from combined_mask since they have no separate
+    # whole-region mask of their own.
+    channels = {
+        "cell": grayscale_channel(image, cell_mask),
+        "nucleus": grayscale_channel(image, nucleus_mask),
+        "nucleoli": grayscale_channel(image, combined_mask == NUCLEOLI_LABEL),
+        "lipid": grayscale_channel(image, combined_mask == LIPID_LABEL),
+    }
     # Real QPI intensity per class (not a 0/1 indicator), restricted to the
     # whole-cell ROI so background pixels don't swamp the correlation.
-    cell_roi = (combined_mask > 0).astype(np.int32)
+    cell_roi = cell_mask.astype(np.int32)
     results = {}
-    for label_1, label_2 in itertools.combinations(CHANNEL_LABELS, 2):
-        pixels_1 = grayscale_channel(image, combined_mask, label_1)
-        pixels_2 = grayscale_channel(image, combined_mask, label_2)
-        pair_prefix = f"{CHANNEL_LABELS[label_1]}_{CHANNEL_LABELS[label_2]}_"
+    for name_1, name_2 in itertools.combinations(channels, 2):
+        pixels_1 = channels[name_1]
+        pixels_2 = channels[name_2]
+        pair_prefix = f"{name_1}_{name_2}_"
         for _, func in correlation_measurements.items():
             for feature_name, value in func(pixels_1, pixels_2, cell_roi).items():
                 results[f"{pair_prefix}{feature_name}"] = value
@@ -124,7 +134,7 @@ def process_crop(image_file, combined_mask_file, cell_mask_file, nucleus_mask_fi
 
     cell_df = measure_single_object(cell_mask, image, "cell_")
     nucleus_df = measure_single_object(nucleus_mask, image, "nucleus_")
-    coloc_df = measure_pairwise_colocalization(image, combined_mask)
+    coloc_df = measure_pairwise_colocalization(image, cell_mask, nucleus_mask, combined_mask)
 
     return pd.concat(
         [
