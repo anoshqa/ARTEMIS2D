@@ -34,7 +34,7 @@ adata = sc.AnnData(X=propnumeric)
 groups=['Parental','CarboplatinR','PaclitaxelR','EpirubicinR']
 adata.obs['true_labels'] = pd.Categorical(supervised_labels, categories=groups, ordered=True)
 sc.pp.scale(adata, max_value=10)
-sc.tl.pca(adata, n_comps=15, svd_solver='arpack')
+sc.tl.pca(adata, n_comps=100, svd_solver='arpack')
 
 pc_component = get_pca_component_for_variance(adata)
 print(f"90% variance explained at PC{pc_component}")

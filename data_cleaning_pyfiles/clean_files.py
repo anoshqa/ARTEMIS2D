@@ -13,23 +13,23 @@ def get_base_name(filename):
 
 
 prop = pd.read_csv('hc_features.csv')
-propdino = pd.read_csv('dino_features_mip_masked.csv')
+procp = pd.read_csv('cp_measure_features.csv')
 
 prop = prop.dropna(axis=0, how='any').reset_index(drop=True)
 prop['mask_key'] = prop['mask_file'].astype(str).apply(get_base_name)
-propdino['mask_key'] = propdino['mask_file'].astype(str).apply(get_base_name)
+procp['mask_key'] = procp['mask_file'].astype(str).apply(get_base_name)
 
 prop['row_index'] = np.arange(len(prop))
-propdino['row_index'] = np.arange(len(propdino))
+procp['row_index'] = np.arange(len(procp))
 
 matched_dino = []
 for _, row in prop.iterrows():
     key = row['mask_key']
-    candidates = propdino[propdino['mask_key'] == key]
+    candidates = procp[procp['mask_key'] == key]
     if not candidates.empty:
         matched_row = candidates.iloc[0]
     else:
-        matched_row = propdino.iloc[row['row_index']] if row['row_index'] < len(propdino) else pd.Series(dtype='object')
+        matched_row = procp.iloc[row['row_index']] if row['row_index'] < len(procp) else pd.Series(dtype='object')
     matched_dino.append(matched_row)
 
 matched_dino = pd.DataFrame(matched_dino).reset_index(drop=True)
