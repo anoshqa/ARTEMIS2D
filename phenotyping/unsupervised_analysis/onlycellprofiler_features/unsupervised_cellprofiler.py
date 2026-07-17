@@ -25,27 +25,13 @@ def get_pca_component_for_variance(adata, variance_threshold=0.90):
             return i + 1
     return len(cumvar)
 
-cp = pd.read_csv('cp_measure_features.csv')
-# NormalizedMoment_0_0/0_1/1_0 are mathematically degenerate (normalized
-# central moments are only defined for order >= 2) and are NaN for every
-# single row regardless of the object - drop before dropna or nothing survives.
-degenerate_cols = [c for c in cp.columns if c.endswith(('NormalizedMoment_0_0', 'NormalizedMoment_0_1', 'NormalizedMoment_1_0'))]
-cp = cp.drop(columns=degenerate_cols)
-
-# cp_measure_features.csv has no 'Type' label of its own; pull it from the
-# handcrafted-features pipeline, joined on the shared image_file identifier.
-labels = pd.read_csv('hc_features_cleaned.csv')[['image_file', 'Type']]
-prop = cp.merge(labels, on='image_file', how='inner')
-
-prop = prop.replace([np.inf, -np.inf], np.nan)
-print('NaN count before cleaning:', prop.isna().sum().sum())
-prop = prop.dropna(axis=0, how='any').reset_index(drop=True)
+# Already fully cleaned by phenotyping/feature_extraction/clean_rotation_invariant.py:
+# Type merged, degenerate/all-NaN columns dropped, NaN rows dropped, and only
+prop = pd.read_csv('cp_measure_features_rotinv.csv')
 propnumeric = prop.drop(columns=['Type', 'image_file', 'combined_mask_file', 'cell_mask_file', 'nucleus_mask_file'])
 masklist = prop['combined_mask_file'].tolist()
 supervised_labels = np.array(prop['Type'])
-
-print('NaN count after cleaning:', propnumeric.isna().sum().sum())
-prop.to_csv('cp_measure_features_cleaned.csv', index=False)
+print(f'Loaded {prop.shape[0]} cells x {propnumeric.shape[1]} rotation-invariant features')
 
 adata = sc.AnnData(X=propnumeric)
 groups=['Parental','CarboplatinR','PaclitaxelR','EpirubicinR']
