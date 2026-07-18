@@ -163,6 +163,37 @@ g.fig.suptitle('Cluster-defining features (z-scored cluster means)', y=1.02)
 g.savefig(f"{OUTDIR}\\cluster_feature_heatmap.png", dpi=300, bbox_inches='tight')
 plt.close(g.fig)
 
+# 5. Representative cells per cluster: the N cells closest to each cluster's
+#    centroid in PCA space (the representation Leiden/neighbors actually used),
+#    shown as mask thumbnails - one row per cluster (Fig. 4C/E analog).
+N_REP = 5
+Xpca = adata.obsm['X_pca']
+fig, axes = plt.subplots(len(uniq), N_REP, figsize=(2.2 * N_REP, 2.4 * len(uniq)))
+axes = np.atleast_2d(axes)
+rep_records = []
+for r, u in enumerate(uniq):
+    idx = np.where(clusters == u)[0]
+    centroid = Xpca[idx].mean(axis=0)
+    order = idx[np.argsort(np.linalg.norm(Xpca[idx] - centroid, axis=1))]
+    reps = order[:N_REP]
+    for c in range(N_REP):
+        ax = axes[r, c]
+        if c < len(reps):
+            ax.imshow(processed_images_np[reps[c]], cmap='viridis', vmin=0, vmax=4, interpolation='nearest')
+            rep_records.append({'cluster': u, 'rank': c, 'image_file': prop['image_file'].iloc[reps[c]],
+                                'combined_mask_file': masklist[reps[c]]})
+        ax.set_xticks([]); ax.set_yticks([])
+        for s in ax.spines.values():
+            s.set_visible(False)
+    axes[r, 0].set_ylabel(f'Cluster {u}', rotation=0, ha='right', va='center',
+                          fontsize=13, labelpad=28)
+fig.suptitle('Representative cells per cluster (closest to PCA centroid)', y=1.01)
+plt.tight_layout()
+plt.savefig(f"{OUTDIR}\\cluster_representative_cells.svg", bbox_inches='tight')
+plt.close(fig)
+pd.DataFrame(rep_records).to_csv(f"{OUTDIR}\\cluster_representative_cells.csv", index=False)
+
 print(f"Top cluster-defining features ({len(top_features)}): {top_features}")
 print("Wrote umap_leiden.svg, cluster_composition.svg/.csv, heatmap_leiden_topfeatures.svg, "
-      "cluster_feature_heatmap.png, cluster_rank_features.csv, cluster_mean_features.csv")
+      "cluster_feature_heatmap.png, cluster_representative_cells.svg/.csv, "
+      "cluster_rank_features.csv, cluster_mean_features.csv")

@@ -1,0 +1,26 @@
+cluster,rank,image_file,combined_mask_file
+0,0,20240316.120337.659.MDA-MB231P-016_HT2D_0.tif_submask_255.tiff,20240316.120337.659.MDA-MB231P-016_HT2D_0.tif_submask_255.tiff
+0,1,20240317.111506.680.MDAMB2312ParentalR3-099Stitching_HT2D_0.png_mip3.tiff,20240317.111506.680.MDAMB2312P_unet_mask_combined_masks_mask3.tiff
+0,2,20240704.095848.344.epir2-007Stitching_HT2D_0.png_mip24.tiff,20240704.095848.344.epir2-007S_unet_mask_combined_masks_mask24.tiff
+0,3,20240627.113136.961.pacR_r4_1-021Stitching_HT2D_0.png_mip7.tiff,20240627.113136.961.pacR_r4_1-_unet_mask_combined_masks_mask7.tiff
+0,4,20240316.123311.588.MDA-MB231P-056Stitching_HT2D_0.png_mip13.tiff,20240316.123311.588.MDA-MB231P_unet_mask_combined_masks_mask13.tiff
+1,0,20240318.102727.304.PacR2-049Stitching_HT2D_0.tif_submask_212.tiff,20240318.102727.304.PacR2-049Stitching_HT2D_0.tif_submask_212.tiff
+1,1,20240403.124947.789.CarboR_R3-062Stitching_HT2D_0.tif_submask_255.tiff,20240403.124947.789.CarboR_R3-062Stitching_HT2D_0.tif_submask_255.tiff
+1,2,20240318.104310.739.PacR2-076_RI MIP.tif_submask_255.tiff,20240318.104310.739.PacR2-076_RI MIP.tif_submask_255.tiff
+1,3,20240704.100222.503.epir2-008Stitching_HT2D_0.png_mip13.tiff,20240704.100222.503.epir2-008S_unet_mask_combined_masks_mask13.tiff
+1,4,20240315.161846.580.mdamb231parentalr1-064Stitching_HT2D_0.tif_submask_255.tiff,20240315.161846.580.mdamb231parentalr1-064Stitching_HT2D_0.tif_submask_255.tiff
+2,0,20240703.141558.192.epirz-r1-026Stitching_HT2D_0.png_mip11.tiff,20240703.141558.192.epirz-r1-0_unet_mask_combined_masks_mask11.tiff
+2,1,20240315.155457.597.mdamb231parentalr1-049Stitching_HT2D_0.png_mip8.tiff,20240315.155457.597.mdamb231pa_unet_mask_combined_masks_mask8.tiff
+2,2,20240629.114816.537.carbR_r1-021Stitching_HT2D_0.png_mip14.tiff,20240629.114816.537.carbR_r1-0_unet_mask_combined_masks_mask14.tiff
+2,3,20240315.153545.242.mdamb231parentalr1-027Stitching_HT2D_0.tif_submask_191.tiff,20240315.153545.242.mdamb231parentalr1-027Stitching_HT2D_0.tif_submask_191.tiff
+2,4,20240227.170723.189.MDAMB231Pack-026Stitching_HT2D_0.png_mip3.tiff,20240227.170723.189.MDAMB231Pa_unet_mask_combined_masks_mask3.tiff
+3,0,20240318.103544.475.PacR2-066_RI MIP.tif_submask_255.tiff,20240318.103544.475.PacR2-066_RI MIP.tif_submask_255.tiff
+3,1,20240227.175241.448.MDAMB231Pack-061_HT2D_0.tif_submask_255.tiff,20240227.175241.448.MDAMB231Pack-061_HT2D_0.tif_submask_255.tiff
+3,2,20240627.105820.669.pacR_r4_1-006Stitching_HT2D_0.png_mip6.tiff,20240627.105820.669.pacR_r4_1-_unet_mask_combined_masks_mask6.tiff
+3,3,20240317.105414.911.MDAMB2312ParentalR3-069Stitching_HT2D_0.tif_submask_255.tiff,20240317.105414.911.MDAMB2312ParentalR3-069Stitching_HT2D_0.tif_submask_255.tiff
+3,4,20240414.170850.155.epir3-070Stitching_HT2D_0.png_mip255.tiff,20240414.170850.155.epir3-070S_unet_mask_combined_masks_mask255.tiff
+4,0,20240629.110829.794.carbR_r1-009Stitching_HT2D_0.png_mip13.tiff,20240629.110829.794.carbR_r1-0_unet_mask_combined_masks_mask13.tiff
+4,1,20240403.123750.071.CarboR_R3-049Stitching_HT2D_0.png_mip2.tiff,20240403.123750.071.CarboR_R3-_unet_mask_combined_masks_mask2.tiff
+4,2,20240629.110829.794.carbR_r1-009Stitching_HT2D_0.png_mip6.tiff,20240629.110829.794.carbR_r1-0_unet_mask_combined_masks_mask6.tiff
+4,3,20240629.110613.410.carbR_r1-008Stitching_HT2D_0.png_mip5.tiff,20240629.110613.410.carbR_r1-0_unet_mask_combined_masks_mask5.tiff
+4,4,20240704.103106.537.epir2-015Stitching_HT2D_0.png_mip6.tiff,20240704.103106.537.epir2-015S_unet_mask_combined_masks_mask6.tiff

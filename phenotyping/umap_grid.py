@@ -79,7 +79,7 @@ def umap_grid_bin_thumbnails(
         if img is None:
             continue
 
-        imagebox = OffsetImage(img, zoom=zoom)
+        imagebox = OffsetImage(img, zoom=zoom, interpolation='nearest')
 
         if place_at == "bin_center":
             px = x_centers[key[0]]
