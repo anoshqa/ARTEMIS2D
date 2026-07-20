@@ -74,7 +74,9 @@ ax.legend(frameon=False, loc="center left", bbox_to_anchor=(1.02, 0.5))
 plt.tight_layout()
 plt.savefig("phenotyping\\unsupervised_analysis\\onlyhc_features\\umap_supervisedlabels_norm01.svg", bbox_inches="tight")
 
-processed_images_np = np.array([np.array(Image.open(os.path.join(mask_folder_path, img_name)).convert('L').resize((150, 150))).astype(np.float32) for img_name in masklist])
+# NEAREST: these are categorical label masks (1=cytoplasm, 2=nucleoplasm,
+# 3=nucleoli, 4=lipid) - bilinear resizing would invent intermediate label values.
+processed_images_np = np.array([np.array(Image.open(os.path.join(mask_folder_path, img_name)).convert('L').resize((150, 150), Image.NEAREST)).astype(np.float32) for img_name in masklist])
 processed_images_np[processed_images_np == 0] = np.nan
 print(processed_images_np.shape)
 cell_area=prop['cell_area_um2'].values
