@@ -6,10 +6,24 @@ import scanpy as sc
 import numpy as np
 from PIL import Image
 import os
+import skimage.io
 import phenotyping.umap_grid as grid
 from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 
 mask_folder_path = r'C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\phenotyping phase\Mask_proofread'
+# full, uncropped MIPs (1350x1350) for representative-cell display, as opposed
+# to the categorical Mask_proofread thumbnails used in the bin grid above
+images_folder = r'C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\phenotyping phase\MIP_proofread'
+# display-only contrast window for the representative-cell MIP grid - tighter
+# than the 13300-14100 bounds used for actual feature extraction, so this does
+# NOT need to match cp_measure_extraction.py's normalization.
+RAW_INTENSITY_MIN = 13380.0
+RAW_INTENSITY_MAX = 13800.0
+
+
+def load_mip(image_file):
+    raw = skimage.io.imread(os.path.join(images_folder, image_file)).astype(np.float32)
+    return np.clip((raw - RAW_INTENSITY_MIN) / (RAW_INTENSITY_MAX - RAW_INTENSITY_MIN), 0, 1)
 
 font_path=r'C:\Users\anous\Downloads\Roboto (1)\Roboto-Regular.ttf'
 fm.fontManager.addfont(font_path)
@@ -58,20 +72,46 @@ y_norm = (y - y.min()) / (y.max() - y.min() + 1e-12)
 
 labels = adata.obs["true_labels"].values
 
-fig, ax = plt.subplots(figsize=(8,5), dpi=300)
-palette = { "Parental": "red", "CarboplatinR": "blue", "PaclitaxelR": "yellow", "EpirubicinR": "green" }
+# Clean UMAP style shared by both the supervised-label and Leiden-cluster
+# plots: no boxed frame, minimal arrow axes instead of ticks, proportional
+# arrow/label sizing (scaled for our [0,1] frame, not a raw ~10-unit range).
+fontSize = 10
+axisSep = 0.02
+arrowProp = 0.15
+
+fig, ax = plt.subplots(figsize=(5, 5), dpi=300)
+palette = { "Parental": "red", "CarboplatinR": "blue", "PaclitaxelR": "darkorange", "EpirubicinR": "green" }
 for lab, col in palette.items():
     m = (labels == lab)
-    ax.scatter(x_norm[m], y_norm[m], s=50, c=col, alpha=0.4, edgecolors="none", label=lab)
+    ax.scatter(x_norm[m], y_norm[m], s=10, c=col, alpha=0.4, edgecolors="none", label=lab)
 
-# axis matches grid
+ax.spines[["top", "right", "left", "bottom"]].set_visible(False)
 ax.set_xticks([])
 ax.set_yticks([])
-ax.set_xlabel("UMAP1")
-ax.set_ylabel("UMAP2")
-ax.legend(frameon=False, loc="center left", bbox_to_anchor=(1.02, 0.5))
-plt.tight_layout()
-plt.savefig("phenotyping\\unsupervised_analysis\\onlycellprofiler_features\\umap_supervisedlabels_norm01.svg", bbox_inches="tight")
+
+ax.set_xlabel("UMAP 1", loc="left", fontsize=fontSize)
+ax.set_ylabel("UMAP 2", loc="bottom", fontsize=fontSize)
+
+xmin, xmax = ax.get_xlim()
+ymin, ymax = ax.get_ylim()
+ax.xaxis.set_label_coords(xmin - axisSep, ymin - axisSep, transform=ax.transData)
+ax.yaxis.set_label_coords(xmin - axisSep, ymin - axisSep, transform=ax.transData)
+
+arrow_len = arrowProp * (xmax - xmin)
+head_size = 0.015 * (xmax - xmin)
+ax.arrow(xmin, ymin, arrow_len, 0, fc="k", ec="k", lw=1,
+         head_width=head_size, head_length=head_size, overhang=0.3,
+         length_includes_head=True, clip_on=False)
+ax.arrow(xmin, ymin, 0, arrow_len, fc="k", ec="k", lw=1,
+         head_width=head_size, head_length=head_size, overhang=0.3,
+         length_includes_head=True, clip_on=False)
+ax.set_aspect("equal", adjustable="box")
+ax.set_title("Supervised Labels", loc="left")
+fig.legend(markerscale=2, fontsize=fontSize, loc="center right",
+           bbox_to_anchor=[1.1, 0.5], title='Type')
+
+plt.savefig("phenotyping\\unsupervised_analysis\\onlycellprofiler_features\\umap_supervisedlabels_norm01.svg", dpi=500, bbox_inches="tight")
+plt.close(fig)
 
 # NEAREST: these are categorical label masks (1=cytoplasm, 2=nucleoplasm,
 # 3=nucleoli, 4=lipid) - bilinear resizing would invent intermediate label values.
@@ -104,17 +144,42 @@ uniq = sorted(adata.obs['leiden_0.5'].cat.categories, key=int)
 cmap = plt.get_cmap('tab20b', len(uniq))
 print(f"Leiden: {len(uniq)} clusters {uniq}")
 
-# 1. UMAP colored by Leiden cluster (same [0,1] frame as the thumbnail grid)
-fig, ax = plt.subplots(figsize=(8, 5), dpi=300)
+# 1. UMAP colored by Leiden cluster - same clean style (fontSize/axisSep/
+#    arrowProp) and [0,1] frame as the supervised-label plot above, plus the
+#    cmap/uniq ordering shared with the rest of this script.
+fig, ax = plt.subplots(figsize=(5, 5), dpi=300)
 for i, u in enumerate(uniq):
     m = clusters == u
-    ax.scatter(x_norm[m], y_norm[m], s=50, color=cmap(i), alpha=0.8,
-               edgecolors='none', label=f'cluster {u}')
-ax.set_xticks([]); ax.set_yticks([])
-ax.set_xlabel("UMAP1"); ax.set_ylabel("UMAP2")
-ax.legend(frameon=False, loc="center left", bbox_to_anchor=(1.02, 0.5))
-plt.tight_layout()
-plt.savefig(f"{OUTDIR}\\umap_leiden.svg", bbox_inches="tight")
+    ax.scatter(x_norm[m], y_norm[m], c=[cmap(i)], s=10, label=u)
+
+ax.spines[["top", "right", "left", "bottom"]].set_visible(False)
+ax.set_xticks([])
+ax.set_yticks([])
+
+ax.set_xlabel("UMAP 1", loc="left", fontsize=fontSize)
+ax.set_ylabel("UMAP 2", loc="bottom", fontsize=fontSize)
+
+# Put labels at origin with some small separation from arrows
+xmin, xmax = ax.get_xlim()
+ymin, ymax = ax.get_ylim()
+ax.xaxis.set_label_coords(xmin - axisSep, ymin - axisSep, transform=ax.transData)
+ax.yaxis.set_label_coords(xmin - axisSep, ymin - axisSep, transform=ax.transData)
+
+# Add arrows
+arrow_len = arrowProp * (xmax - xmin)
+head_size = 0.015 * (xmax - xmin)
+ax.arrow(xmin, ymin, arrow_len, 0, fc="k", ec="k", lw=1,
+         head_width=head_size, head_length=head_size, overhang=0.3,
+         length_includes_head=True, clip_on=False)
+ax.arrow(xmin, ymin, 0, arrow_len, fc="k", ec="k", lw=1,
+         head_width=head_size, head_length=head_size, overhang=0.3,
+         length_includes_head=True, clip_on=False)
+ax.set_aspect("equal", adjustable="box")
+ax.set_title("Leiden Clusters", loc="left")
+fig.legend(markerscale=2, fontsize=fontSize, loc="center right",
+           bbox_to_anchor=[1.1, 0.5], title='Cluster')
+
+plt.savefig(f"{OUTDIR}\\umap_leiden.svg", dpi=500, bbox_inches="tight")
 plt.close(fig)
 
 # 2. Treatment x cluster composition (Fig. 4D analog): fraction of each
@@ -167,7 +232,9 @@ plt.close(g.fig)
 
 # 5. Representative cells per cluster: the N cells closest to each cluster's
 #    centroid in PCA space (the representation Leiden/neighbors actually used),
-#    shown as mask thumbnails - one row per cluster (Fig. 4C/E analog).
+#    shown as full MIPs from MIP_proofread (not masks) - one row per cluster
+#    (Fig. 4C/E analog). Loaded on demand, not eagerly for the whole dataset -
+#    these are full 1350x1350 images, unlike the pre-resized mask thumbnails.
 N_REP = 5
 Xpca = adata.obsm['X_pca']
 fig, axes = plt.subplots(len(uniq), N_REP, figsize=(2.2 * N_REP, 2.4 * len(uniq)))
@@ -181,15 +248,16 @@ for r, u in enumerate(uniq):
     for c in range(N_REP):
         ax = axes[r, c]
         if c < len(reps):
-            ax.imshow(processed_images_np[reps[c]], cmap='viridis', vmin=0, vmax=4, interpolation='nearest')
-            rep_records.append({'cluster': u, 'rank': c, 'image_file': prop['image_file'].iloc[reps[c]],
+            image_file = prop['image_file'].iloc[reps[c]]
+            ax.imshow(load_mip(image_file), cmap='gray', vmin=0, vmax=1)
+            rep_records.append({'cluster': u, 'rank': c, 'image_file': image_file,
                                 'combined_mask_file': masklist[reps[c]]})
         ax.set_xticks([]); ax.set_yticks([])
         for s in ax.spines.values():
             s.set_visible(False)
     axes[r, 0].set_ylabel(f'Cluster {u}', rotation=0, ha='right', va='center',
                           fontsize=13, labelpad=28)
-fig.suptitle('Representative cells per cluster (closest to PCA centroid)', y=1.01)
+fig.suptitle('Representative cells per cluster (closest to PCA centroid) - full MIP', y=1.01)
 plt.tight_layout()
 plt.savefig(f"{OUTDIR}\\cluster_representative_cells.svg", bbox_inches='tight')
 plt.close(fig)

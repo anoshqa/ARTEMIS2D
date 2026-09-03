@@ -14,7 +14,7 @@ import qpi_seg.train.validate as validate
 import qpi_seg.train.launch_tensorboard as LT
 #import qpi_seg.dicecoefficient as DC
 import subprocess
-import qpi_seg.mean_fn as mean
+#import qpi_seg.mean_fn as mean
 import qpi_seg.train.calculate_weights as CW
 from torch.utils.tensorboard import SummaryWriter
 
@@ -24,6 +24,7 @@ assert torch.cuda.is_available()
 
 image_folder=r'D:\TRAINING_DATA_FINAL\MIP_ALL'
 mask_folder=r'D:\TRAINING_DATA_FINAL\MASK_ALL'
+#original percentage =0.8
 train_files_percentage = 1.00
 image_filenames=sorted(os.listdir(image_folder))
 mask_filenames=sorted(os.listdir(mask_folder))

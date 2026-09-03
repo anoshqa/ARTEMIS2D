@@ -12,7 +12,7 @@ The two outputs are combined into a per-cell mask, which then feeds into downstr
 ```
 ├── README.md                  
 ├── data_cleaning_pyfiles/     <- misc. data cleaning utilities
-├── models/                    <- unet.py and unet_tests
+├── models/                    <- unet.py and unet_tests (model architecture)
 ├── qpi_seg/
 │   ├── train/
 │   │   ├── train_unet.py           <- train the U-Net

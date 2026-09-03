@@ -5,21 +5,21 @@ import numpy as np
 from skimage.transform import resize
 
 #original  images
-image_folder = r"C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\UNSEEN_MIP_1_REPEATED"
+image_folder = r"C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\MISC_NONBC_NONFIBRO\WAT_AYAN\Total HWAT data\All_WAT_MIP\Remaining_MIP\WAT_d7_c1_MIP"
 #all mask files 
-output_mask_folder = r"C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\UNSEEN_COMBINED_MASK"
+output_mask_folder = r"C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\MISC_NONBC_NONFIBRO\WAT_AYAN\Total HWAT data\All_WAT_MIP\Output\masks_instance\D7_C1"
 #corrected mask folder below
-corrected_mask_folder=r"C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\Unseen_combined_corrected"
+corrected_mask_folder=r"C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\MISC_NONBC_NONFIBRO\WAT_AYAN\Total HWAT data\All_WAT_MIP\Output\Mask_instance_corrected"
 
 val_image_files=sorted(os.listdir(image_folder))
 
-val_images_org=[tifffile.imread(os.path.join(image_folder, file)) for file in val_image_files]
+val_images_org=[tifffile.imread(os.path.join(image_folder, file)) for file in val_image_files[0:10]]
 val_images=[resize(image, (418,418),order=0, anti_aliasing=False,preserve_range=True) for image in val_images_org]
 val_image_stack = np.stack(val_images, axis=0)
 
 mask_files=sorted(os.listdir(output_mask_folder))
 
-masks_org=[tifffile.imread(os.path.join(output_mask_folder, file)).astype(np.uint16) for file in mask_files]
+masks_org=[tifffile.imread(os.path.join(output_mask_folder, file)).astype(np.uint16) for file in mask_files[0:10]]
 masks=[resize(mask, (418,418),order=0, anti_aliasing=False,preserve_range=True) for mask in masks_org]
 print(masks[1].dtype)
 mask_stack = np.stack(masks, axis=0)

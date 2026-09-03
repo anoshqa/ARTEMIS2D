@@ -10,7 +10,6 @@ import numpy as np
 import qpi_seg.visualizing_utils.plot_grids as pg
 import qpi_seg.train.split_mask_5_channels as split
 import qpi_seg.visualizing_utils.visualize_unseen_unmasked as visualize
-from skimage.transform import resize
 
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 #assert torch.cuda.is_available()
@@ -33,10 +32,10 @@ model.load_state_dict(model_save['model_state_dict'])
 model=model.to(device)
 
 #put your unseen images here
-test_images_folder=r'C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\Test_Santosh_MIP'
+test_images_folder=r'C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\MISC_NONBC_NONFIBRO\WAT_AYAN\Total HWAT data\All_WAT_MIP\WAT_D14_C5_MIP'
 
 #put folder where masks will be saved
-unet_masks_output_folder=r'C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\Test_Santosh_MIP_Output'
+unet_masks_output_folder=r'C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\MISC_NONBC_NONFIBRO\WAT_AYAN\Total HWAT data\All_WAT_MIP\WAT_D14_C5_MIP_UNet_Output'
 
 
 test_files= os.listdir(test_images_folder)
@@ -50,25 +49,30 @@ out_file_name_masks=[os.path.join(unet_masks_output_folder, file) for file in ou
 from_np=transforms_v2.Lambda(lambda x: torch.from_numpy(x))
 
 #for victor's dataset may have to play with this
-norm_min=13370
-norm_max=14200
+#norm_min=13370
+#norm_max=14200
+
+#original
+norm_min=13300
+norm_max=14100
+os.makedirs(unet_masks_output_folder, exist_ok=True)
+
 model.eval()
 model = model.to(device)
 clustermap=[]
-clustermap_list=[]
-scale= 0.2222 / 0.095 
-for i in range(len(test_files)):
+
+
+for i in range(len(test_images)):
+    clustermap_list=[]
     w=test_images[i].shape[0]
     h=test_images[i].shape[1]
-    new_h, new_w = round(h*scale), round(w*scale)
-    img_resampled = resize(test_images[i], (new_h, new_w), anti_aliasing=True, preserve_range=True)
     # pad up to the smallest multiple of 32 that still contains the full
     # image, per image, so nothing is truncated regardless of input size
-    im_size = 32 * ((max(new_w, new_h) + 31) // 32)
-    
+    im_size = 32 * ((max(w, h) + 31) // 32)
+
     transform = transforms_v2.CenterCrop((im_size, im_size))
-    cropped_transform=transforms_v2.CenterCrop((new_w,new_h))
-    torch_test_image = from_np(img_resampled)
+    cropped_transform=transforms_v2.CenterCrop((w,h))
+    torch_test_image = from_np(test_images[i])
     torch_test_image=torch_test_image.float()
     img_norm= (torch_test_image - norm_min) / (norm_max - norm_min)
     img_norm2=img_norm.unsqueeze(dim=0).to(device)
@@ -99,7 +103,7 @@ for i in range(len(test_files)):
     #print(clustermap.shape)
     
     cropped_clustermap=cropped_transform((from_np(clustermap)).unsqueeze(dim=0))
-    visualize.visualize(img_norm, )
+    visualize.visualize(img_norm, cropped_clustermap.squeeze(dim=0))
     print(cropped_clustermap.shape)
     tifffile.imwrite(
         out_file_name_masks[i],

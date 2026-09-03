@@ -12,9 +12,9 @@ import pandas as pd
 #images_folder=r'D:\TRAINING_DATA_FINAL\TEST_MIP'
 
 
-cellpose_mask_folder=r'C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\UNSEEN_MIP_1_CELL_MASK'
+cellpose_mask_folder=r'C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\MISC_NONBC_NONFIBRO\WAT_AYAN\Total HWAT data\All_WAT_MIP\WAT_d7_c1_Masks'
 
-unet_mask_folder=r'C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\UNSEEN_UNET_MASK'
+unet_mask_folder=r'C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\MISC_NONBC_NONFIBRO\WAT_AYAN\Total HWAT data\All_WAT_MIP\WAT_d7_c1_MIP_UNet_Output'
 
 output_folder=r'C:\Users\anous\OneDrive - Johns Hopkins\2026_datanalysis\dlmi2\UNSEEN_COMBINED_MASK'
 #images=[skimage.io.imread(os.path.join(images_folder,file)) for file in sorted(os.listdir(images_folder))]
@@ -48,7 +48,10 @@ for i in range(len(cp_files)):
         unet_mask2[mask2 != submask_value] = 0
         mask2[mask2 !=submask_value]=0
         mask2[mask2 >0]=1
-        unet_mask2[(unet_mask2==0) & (mask2==1)]=1
+        #for multichannel (all nucleus/nucleolus/lipid droplets) masks have this
+        #unet_mask2[(unet_mask2==0) & (mask2==1)]=1
+        #for retaining only cellular + lipid droplet masks
+        unet_mask2[(unet_mask2!=4) & (mask2==1)]=1
         #per cell semantic mask = cp_mask after filter x unet_masks[i]
         out_file_name_stem=f"{out_file_name_stems[i]}_mask{submask_value}.tiff"
         tifffile.imwrite(
